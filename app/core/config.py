@@ -26,11 +26,15 @@ class Config:
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "FAstAPI-Template")
     PROJECT_VERSION: str = os.getenv("PROJECT_VERSION", "1.0.0")
     PROJECT_DESCRIPTION: str = os.getenv("PROJECT_DESCRIPTION", "FAstAPI Template")
-    PROJECT_HOST: str = os.getenv("PROJECT_HOST")
-    PROJECT_PORT: str = os.getenv("PROJECT_PORT")
+    PROJECT_HOST: str = os.getenv("PROJECT_HOST", "0.0.0.0")
+    PROJECT_PORT: str = os.getenv("PROJECT_PORT", 8000)
     PROJECT_DEBUG: bool = os.getenv("PROJECT_DEBUG", True)
     PROJECT_RELOAD: bool = os.getenv("PROJECT_RELOAD", True)
     PROJECT_ENV: str = os.getenv("PROJECT_ENV", "development")
+    PROJECT_DOCS_URL: str = os.getenv("PROJECT_DOCS_URL", "/docs")
+    PROJECT_REDOC_URL: str = os.getenv("PROJECT_REDOC_URL", "/redoc")
+    PROJECT_OPENAPI_URL: str = os.getenv("PROJECT_OPENAPI_URL", "/openapi.json")
+    PROJECT_API_PREFIX: str = os.getenv("PROJECT_API_PREFIX", "/api")
     PROJECT_SECRET_KEY: str = os.getenv("PROJECT_SECRET_KEY", "secret_key")
     PROJECT_ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("PROJECT_ACCESS_TOKEN_EXPIRE_MINUTES", 30))
     PROJECT_REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("PROJECT_REFRESH_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
@@ -80,6 +84,9 @@ def get_config() -> Config:
         return ProductionConfig()
     else:
         raise ValueError("Invalid environment variable")
+
+
+config = get_config()
 
 
 if __name__ == '__main__':
