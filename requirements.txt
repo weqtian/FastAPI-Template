@@ -5,3 +5,4 @@ pydantic~=2.11.1
 motor~=3.7.0
 fastapi~=0.115.12
 uvicorn~=0.34.0
+starlette~=0.46.1
