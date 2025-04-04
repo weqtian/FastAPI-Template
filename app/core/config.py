@@ -25,7 +25,7 @@ class Config:
     #================================== 项目配置 ==================================#
     PROJECT_NAME: str = "FAstAPI-Template"
     PROJECT_VERSION: str = "1.0.0"
-    PROJECT_DESCRIPTION: str = "FAstAPI-Template"
+    PROJECT_DESCRIPTION: str = "FAstAPI Template"
     PROJECT_HOST: str = os.getenv("PROJECT_HOST")
     PROJECT_PORT: str = os.getenv("PROJECT_PORT")
     PROJECT_DEBUG: bool = os.getenv("PROJECT_DEBUG", True)
