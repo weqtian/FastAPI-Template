@@ -1,0 +1,20 @@
+[project]
+name = "fastapi-template"
+version = "0.1.0"
+description = "FastAPI项目模板"
+authors = [
+    {name = "晴天",email = "weqtian@outlook.com"}
+]
+readme = "README.md"
+requires-python = "~=3.10"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)",
+    "uvicorn (>=0.34.0,<0.35.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "loguru (>=0.7.3,<0.8.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
