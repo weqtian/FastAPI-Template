@@ -18,7 +18,7 @@ class UserRepository:
     async def create(user_data: Dict[str, Any]) -> User:
         """
         创建用户
-        :param user_data: 用户数据库
+        :param user_data: 用户数据
         :return:
         """
         try:
