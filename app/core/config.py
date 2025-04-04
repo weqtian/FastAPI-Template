@@ -23,9 +23,9 @@ class Config:
         load_dotenv(dotenv_path=Config.ENV_FILE)
 
     #================================== 项目配置 ==================================#
-    PROJECT_NAME: str = "FAstAPI-Template"
-    PROJECT_VERSION: str = "1.0.0"
-    PROJECT_DESCRIPTION: str = "FAstAPI Template"
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "FAstAPI-Template")
+    PROJECT_VERSION: str = os.getenv("PROJECT_VERSION", "1.0.0")
+    PROJECT_DESCRIPTION: str = os.getenv("PROJECT_DESCRIPTION", "FAstAPI Template")
     PROJECT_HOST: str = os.getenv("PROJECT_HOST")
     PROJECT_PORT: str = os.getenv("PROJECT_PORT")
     PROJECT_DEBUG: bool = os.getenv("PROJECT_DEBUG", True)
