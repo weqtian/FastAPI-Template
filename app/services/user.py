@@ -21,4 +21,4 @@ class UserService:
         """ 注册用户 """
 
         user = await self._repo.create({**user_data.model_dump(), "user_id": "52111890", "display_id": "1314520"})
-        return RegisterResponse(data=user.to_dict())
+        return RegisterResponse(data=user.to_dict(exclude_key={"password"}))
