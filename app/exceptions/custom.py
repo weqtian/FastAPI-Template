@@ -20,3 +20,7 @@ class ValidationException(BaseExceptions):
 class NotFoundException(BaseExceptions):
     """资源未找到异常"""
     pass
+
+class DataBaseException(BaseExceptions):
+    """数据库异常"""
+    pass

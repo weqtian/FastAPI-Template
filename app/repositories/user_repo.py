@@ -9,7 +9,7 @@
 from typing import Dict, Any
 from app.models.user import User
 from app.core.logger import logger
-from beanie.exceptions import DocumentNotFound
+from app.utils.serialization_util import serialize_data
 
 
 class UserRepository:
@@ -26,9 +26,9 @@ class UserRepository:
             user = await User.find(email=email).to_list()
             if not user:
                 return None
-            return user
+            return serialize_data(user)
         except Exception as e:
-            logger.error(f"获取用户失败: {e}")
+            logger.error(f"查询用户异常: {e}")
             raise e
 
     @staticmethod

@@ -7,6 +7,7 @@
 @Date    ：2025-04-04 17:46:42
 """
 from app.core.logger import logger
+from app.exceptions.error_code import ErrorCode
 from app.schemas.request.auth import RegisterUser
 from app.exceptions.custom import BusinessException
 from app.utils.user_id_util import generate_user_id
@@ -23,6 +24,15 @@ class UserService:
 
     async def register(self, user_data: RegisterUser) -> RegisterResponse:
         """ 注册用户 """
-
-        user = await self._repo.create({**user_data.model_dump(), "user_id": "52111890", "display_id": "1314520"})
-        return RegisterResponse(data=user)
+        try:
+            email_is_exist = await self._repo.get_user_by_email(user_data.email)
+            if email_is_exist:
+                raise BusinessException(code=ErrorCode.USER_EMAIL_EXIST.value, message="该邮箱已注册")
+            user_data.password = encrypt_password(user_data.password)
+            user_data.user_id = generate_user_id()
+            user_data.display_id = generate_user_id()
+            user = await self._repo.create({**user_data.model_dump()})
+            return RegisterResponse(data=user)
+        except Exception as e:
+            logger.error(f"注册用户异常: {e}")
+            raise BusinessException(code=ErrorCode.SERVER_ERROR.value, message="服务器内部异常")
