@@ -10,6 +10,7 @@ from beanie import init_beanie
 from app.models.user import User
 from app.core.logger import logger
 from app.core.config import config
+from pymongo.errors import  ConnectionFailure, NetworkTimeout
 from motor.motor_asyncio import AsyncIOMotorClient
 
 
@@ -31,9 +32,13 @@ class DataBaseManager:
             logger.info("Started Initializing Beanie Document Models")
             await init_beanie(database=self._client[config.DB_NAME], document_models=[User])
             logger.info("Finished Initializing Beanie Document Models")
-        except Exception as e:
+
+        except ConnectionFailure or NetworkTimeout as e:
             logger.error(f"Connecting to MongoDB failed: {str(e)}")
             raise RuntimeError(f"Connecting to MongoDB failed: {str(e)}")
+        except Exception as e:
+            logger.error(f"The database link sent an unknown exception: {e}")
+            raise RuntimeError(f"The database link sent an unknown exception: {e}")
 
     async def disconnect(self):
         """ 关闭数据库连接 """

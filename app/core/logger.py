@@ -6,10 +6,10 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:02:59
 """
-import os.path
 import sys
-from app.core.config import get_config
+import os.path
 from loguru import logger as loguru_logger
+from app.core.config import get_config, LOG_DIR
 
 
 class Logger:
@@ -30,7 +30,7 @@ class Logger:
         # 添加文件日志
         if self._setting.LOG_OUTPUT_FILE:
             # 按天轮转日志文件
-            app_log_file = os.path.join(self._setting.LOG_DIR, 'app_{time:YYYY-MM-DD}.log')
+            app_log_file = os.path.join(LOG_DIR, 'app_{time:YYYY-MM-DD}.log')
             self._logger.add(
                 app_log_file,  # 日志文件路径
                 format=self._setting.LOG_FORMAT,  # 日志格式
@@ -43,7 +43,7 @@ class Logger:
             )
 
             # 添加错误日志单独保存
-            error_log_file = os.path.join(self._setting.LOG_DIR, 'error_{time:YYYY-MM-DD}.log')
+            error_log_file = os.path.join(LOG_DIR, 'error_{time:YYYY-MM-DD}.log')
             self._logger.add(
                 error_log_file,
                 format=self._setting.LOG_FORMAT,

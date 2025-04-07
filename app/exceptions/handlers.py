@@ -73,6 +73,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         :param exc: 未捕获的异常实例
         :return: JSON响应
         """
+        logger.info("Global exception handler triggered")  # 添加调试日志
         logger.error(f"Unhandled Exception -> {str(exc)}", exc_info=True)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

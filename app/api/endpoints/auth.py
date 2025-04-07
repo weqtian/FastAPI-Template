@@ -6,8 +6,10 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:56:42
 """
+from fastapi.exceptions import RequestValidationError
 from app.core.logger import logger
 from app.services.user import UserService
+from app.exceptions.base import BaseExceptions
 from app.schemas.request.auth import RegisterUser
 from app.api.dependencies import get_user_service
 from app.schemas.response.auth import RegisterResponse
@@ -38,3 +40,25 @@ async def login():
 async def logout():
 
     return {"message": "logout"}
+
+
+
+@auth_router.get("/test")
+async def test_endpoint():
+    return {"code": 0, "message": "成功"}
+
+@auth_router.get("/test-business-error")
+async def test_business_error():
+    raise BaseExceptions(code=1001, message="业务逻辑错误示例")
+
+@auth_router.get("/test-http-error")
+async def test_http_error():
+    raise HTTPException(status_code=400, detail="请求参数错误")
+
+@auth_router.get("/test-validation-error")
+async def test_validation_error():
+    raise RequestValidationError(errors=[{"loc": ["query", "id"], "msg": "invalid id"}])
+
+@auth_router.get("/test-unexpected-error")
+async def test_unexpected_error():
+    raise ZeroDivisionError("除以零错误")
