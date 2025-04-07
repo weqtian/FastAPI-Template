@@ -23,11 +23,7 @@ auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 async def register(request: Request, user_data: RegisterUser, user_service: UserService = Depends(get_user_service)):
     """ 注册用户 """
     logger.info(f'客户端请求IP: {request.client.host} 请求方法: {request.method} 当前请求参数: {user_data.model_dump()} ')
-    try:
-        return await user_service.register(user_data)
-    except Exception as e:
-        logger.error(f"注册用户失败: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+    return await user_service.register(user_data)
 
 
 @auth_router.post("/login", summary="登录")
@@ -40,25 +36,3 @@ async def login():
 async def logout():
 
     return {"message": "logout"}
-
-
-
-@auth_router.get("/test")
-async def test_endpoint():
-    return {"code": 0, "message": "成功"}
-
-@auth_router.get("/test-business-error")
-async def test_business_error():
-    raise BaseExceptions(code=1001, message="业务逻辑错误示例")
-
-@auth_router.get("/test-http-error")
-async def test_http_error():
-    raise HTTPException(status_code=400, detail="请求参数错误")
-
-@auth_router.get("/test-validation-error")
-async def test_validation_error():
-    raise RequestValidationError(errors=[{"loc": ["query", "id"], "msg": "invalid id"}])
-
-@auth_router.get("/test-unexpected-error")
-async def test_unexpected_error():
-    raise ZeroDivisionError("除以零错误")
