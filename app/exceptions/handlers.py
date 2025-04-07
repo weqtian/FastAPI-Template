@@ -9,7 +9,7 @@
 from app.core.logger import logger
 from fastapi.responses import JSONResponse
 from fastapi import Request, FastAPI, status
-from app.exceptions.exceptions import BaseExceptions
+from app.exceptions.base import BaseExceptions
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -22,66 +22,59 @@ def register_exception_handlers(app: FastAPI) -> None:
     """
 
     @app.exception_handler(BaseExceptions)
-    async def base_exception_handler(request: Request, exc: BaseExceptions) -> JSONResponse:
+    async def base_exception_handler(_: Request, exc: BaseExceptions):
         """
-        异常处理器
-        :param request: 请求对象
-        :param exc: 异常对象
-        :return:
+        处理自定义业务异常
+        :param _: 请求对象（未使用）
+        :param exc: 自定义业务异常实例
+        :return: JSON响应
         """
-        logger.error(
-            f"业务异常: {exc.detail} | 状态码: {exc.status_code} | URL: {request.url} | "
-            f"方法: {request.method} | 路径: {request.url.path}"
-            f"请求IP: {request.client.host} | 请求参数: {request.user.model_dump()}"
-        )
-        return JSONResponse(status_code=exc.status_code, content=exc.detail)
-
-    @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-        """
-        参数校验异常处理器
-        :param request: 请求对象
-        :param exc: 异常对象
-        :return:
-        """
-        errors = []
-        for error in exc.errors():
-            error_loc = " -> ".join([str(loc) for loc in error["loc"] if loc != "body"])
-            errors.append({
-                "location": error_loc,
-                "message": error["msg"],
-                "type": error["type"]
-            })
-        logger.warning(
-            f"验证异常 | URL: {request.url} | 客户端: {request.client.host} | "
-            f"方法: {request.method} | 路径: {request.url.path} | 错误详情: {errors}"
-        )
+        logger.error(f"BaseExceptions -> code: {exc.code} message: {exc.message}")
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"code": status.HTTP_400_BAD_REQUEST, "message": "请求参数错误", "errors": errors}
+            status_code=status.HTTP_200_OK,
+            content={"code": exc.code, "message": exc.message}
         )
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-        """ HTTP异常处理器 """
-        logger.error(
-            f"HTTP异常: {exc.detail} | 状态码: {exc.status_code} | URL: {request.url} | "
-            f"方法: {request.method} | 路径: {request.url.path}"
-            f"请求IP: {request.client.host}"
-        )
+    async def http_exception_handler(_: Request, exc: StarletteHTTPException):
+        """
+        处理FastAPI内置的HTTP异常
+        :param _: 请求对象（未使用）
+        :param exc: HTTP异常实例
+        :return: JSON响应
+        """
+        logger.warning(f"HTTPException -> code: {exc.status_code} message: {exc.detail}")
         return JSONResponse(
             status_code=exc.status_code,
             content={"code": exc.status_code, "message": exc.detail}
         )
 
-    @app.exception_handler(Exception)
-    async def all_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-        """ 全局异常处理器 """
-        logger.error(
-            f"未知异常: {exc} | URL: {request.url} | 方法: {request.method} | 路径: {request.url.path} "
-            f"请求IP: {request.client.host}"
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(_: Request, exc: RequestValidationError):
+        """
+        处理请求参数验证异常
+        :param _: 请求对象（未使用）
+        :param exc: 请求验证异常实例
+        :return: JSON响应
+        """
+        errors = exc.errors()
+        error_msg = "; ".join([f"{err['loc'][-1]}: {err['msg']}" for err in errors])
+        logger.warning(f"RequestValidationError -> {error_msg}")
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={"code": status.HTTP_422_UNPROCESSABLE_ENTITY, "message": f"参数验证失败: {error_msg}"}
         )
+
+    @app.exception_handler(Exception)
+    async def global_exception_handler(_: Request, exc: Exception):
+        """
+        处理未捕获的全局异常
+        :param _: 请求对象（未使用）
+        :param exc: 未捕获的异常实例
+        :return: JSON响应
+        """
+        logger.error(f"Unhandled Exception -> {str(exc)}", exc_info=True)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"code": 500, "message": "服务器内部错误"}
+            content={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "message": "服务器内部错误"}
         )
