@@ -9,13 +9,30 @@
 from typing import Dict, Any
 from app.models.user import User
 from app.core.logger import logger
+from beanie.exceptions import DocumentNotFound
 
 
 class UserRepository:
     """ 用户数据库操作封装 """
 
     @staticmethod
-    async def create(user_data: Dict[str, Any]) -> User:
+    async def get_user_by_email(email: str) -> list | None:
+        """
+        根据邮箱获取用户
+        :param email: 用户邮箱
+        :return: User对象
+        """
+        try:
+            user = await User.find(email=email).to_list()
+            if not user:
+                return None
+            return user
+        except Exception as e:
+            logger.error(f"获取用户失败: {e}")
+            raise e
+
+    @staticmethod
+    async def create(user_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         创建用户
         :param user_data: 用户数据
@@ -24,7 +41,7 @@ class UserRepository:
         try:
             user = User(**user_data)
             await user.create()
-            return user
+            return user.to_dict(exclude_key={"password"})
         except Exception as e:
             logger.error(f"创建用户失败: {e}")
             raise e
