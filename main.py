@@ -17,7 +17,7 @@ app = create_app()
 if __name__ == '__main__':
     uvicorn.run(
         app='main:app',
-        host=config['PROJECT_HOST'],
+        host=config.PROJECT_HOST,
         port=config.PROJECT_PORT,
         reload=config.PROJECT_RELOAD,
         use_colors=True

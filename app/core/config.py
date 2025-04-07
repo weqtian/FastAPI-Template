@@ -12,6 +12,7 @@ from functools import lru_cache
 from urllib.parse import quote_plus
 from pydantic_settings import BaseSettings
 
+
 # 基础路径
 BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # 检查配置文件是否存在
@@ -30,9 +31,9 @@ class Config(BaseSettings):
     #================================== 项目配置 ==================================#
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "FAstAPI-Template")
     PROJECT_VERSION: str = os.getenv("PROJECT_VERSION", "1.0.0")
+    PROJECT_PORT: int = os.getenv("PROJECT_PORT", 8000)
     PROJECT_DESCRIPTION: str = os.getenv("PROJECT_DESCRIPTION", "FAstAPI Template")
     PROJECT_HOST: str = os.getenv("PROJECT_HOST", "0.0.0.0")
-    PROJECT_PORT: int = os.getenv("PROJECT_PORT", 8000)
     PROJECT_DEBUG: bool = os.getenv("PROJECT_DEBUG", False)
     PROJECT_RELOAD: bool = os.getenv("PROJECT_RELOAD", False)
     PROJECT_ENV: str = os.getenv("PROJECT_ENV", "development")
@@ -108,4 +109,6 @@ config = get_config()
 
 
 if __name__ == '__main__':
-    print('日志路径: ', config.DB_URI)
+    # print('日志路径: ', config.LOG_DIR)
+    # print('数据库连接: ', config.DB_URI)
+    pass
