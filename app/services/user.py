@@ -6,9 +6,13 @@
 @Author  ：晴天
 @Date    ：2025-04-04 17:46:42
 """
+from app.core.logger import logger
 from app.schemas.request.auth import RegisterUser
+from app.exceptions.custom import BusinessException
+from app.utils.user_id_util import generate_user_id
 from app.repositories.user_repo import UserRepository
 from app.schemas.response.auth import RegisterResponse
+from app.utils.encrypt_util import encrypt_password, verify_password
 
 
 class UserService:

@@ -6,14 +6,12 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:56:42
 """
-from fastapi.exceptions import RequestValidationError
 from app.core.logger import logger
 from app.services.user import UserService
-from app.exceptions.base import BaseExceptions
+from fastapi import APIRouter, Request, Depends
 from app.schemas.request.auth import RegisterUser
 from app.api.dependencies import get_user_service
 from app.schemas.response.auth import RegisterResponse
-from fastapi import APIRouter, Request, Depends, HTTPException
 
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
