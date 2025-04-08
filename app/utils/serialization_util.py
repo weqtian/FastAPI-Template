@@ -18,6 +18,9 @@ def serialize_data(data: dict | list) -> dict | list:
         """辅助函数，序列化字典项"""
         if "id" in item:
             item["id"] = str(item["id"])
+            item.pop('password', None)
+            item.pop('access_token', None)
+            item.pop('refresh_token', None)
         return item
 
     if isinstance(data, dict):  # 如果data是字典

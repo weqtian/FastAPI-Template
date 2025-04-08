@@ -26,7 +26,7 @@ class UserRepository:
             user = await User.find_one(User.email==email)
             if not user:
                 return None
-            return user.to_dict(exclude_key={"password"})
+            return serialize_data(user.to_dict())
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise e
@@ -42,7 +42,7 @@ class UserRepository:
             user = await User.find_one(User.user_id==user_id)
             if not user:
                 return None
-            return user.to_dict(exclude_key={"password"})
+            return serialize_data(user.to_dict())
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise e
@@ -58,7 +58,7 @@ class UserRepository:
             user = await User.find_one(User.display_id==display_id)
             if not user:
                 return None
-            return user.to_dict(exclude_key={"password"})
+            return serialize_data(user.to_dict())
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise e
@@ -73,7 +73,7 @@ class UserRepository:
         try:
             user = User(**user_data)
             await user.create()
-            return user.to_dict(exclude_key={"password"})
+            return serialize_data(user.to_dict())
         except Exception as e:
             logger.error(f"创建用户失败: {e}")
             raise e
