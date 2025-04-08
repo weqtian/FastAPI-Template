@@ -39,8 +39,8 @@ class BaseDocument(Document):
         自定义序列化方法，格式化 datetime 字段并处理脱敏
         :return: 序列化后的数据字典
         """
-        # 获取基础数据，排除原始 id
-        data = self.model_dump(exclude={"id"})
+        # 获取基础数据，排除原始 以及 使用 mode='json' 避免递归调用 serialize_model
+        data = self.model_dump(mode="json", exclude={"id"})
         data["id"] = str(self.id) if self.id else None
 
         # 定义时间格式化函数
