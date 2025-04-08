@@ -25,11 +25,11 @@ class User(BaseDocument):
     is_active: bool = Field(default=True)
     is_deleted: bool = Field(default=False)
     create_time: int = Field(default_factory=lambda: int(datetime.now().timestamp() * 1000))
-    create_date: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    create_date: datetime = Field(default_factory=lambda: datetime.now())
     create_by: str = Field(default="system")
     last_midify_update_by: str = Field(default="system")
     last_modify_update_time: int = Field(default_factory=lambda: int(datetime.now().timestamp() * 1000))
-    last_modify_update_date: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    last_modify_update_date: datetime = Field(default_factory=lambda: datetime.now())
     access_token: str = Field(default=None)
     refresh_token: str = Field(default=None)
 
