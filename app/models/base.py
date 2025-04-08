@@ -6,10 +6,12 @@
 @Author  ：晴天
 @Date    ：2025-04-04 19:19:37
 """
+from pydantic import Field
 from datetime import datetime
+from app.core.logger import logger
 from typing import Dict, Any, ClassVar
-from pydantic import Field, model_serializer
 from beanie import Document, PydanticObjectId
+from app.exceptions.custom import SerializationException
 
 
 class BaseDocument(Document):
@@ -30,29 +32,34 @@ class BaseDocument(Document):
 
     class Config:
         """Pydantic 配置"""
-        json_encoders = {PydanticObjectId: str}  # 将 PydanticObjectId 转换为字符串
+        json_encoders = {
+            PydanticObjectId: str,  # 将 PydanticObjectId 转换为字符串
+        }
         arbitrary_types_allowed = True  # 允许任意类型
 
-    @model_serializer
-    def serialize_model(self) -> Dict[str, Any]:
+    def model_serialize(self) -> Dict[str, Any]:
         """
         自定义序列化方法，格式化 datetime 字段并处理脱敏
         :return: 序列化后的数据字典
         """
-        # 获取基础数据，排除原始 以及 使用 mode='json' 避免递归调用 serialize_model
-        data = self.model_dump(mode="json", exclude={"id"})
-        data["id"] = str(self.id) if self.id else None
+        try:
+            # 使用 model_dump(mode="python") 获取原始数据
+            data = self.model_dump(mode="python", exclude={"id"})
+            data["id"] = str(self.id) if self.id else None
 
-        # 定义时间格式化函数
-        def format_datetime(dt: datetime | None) -> str | None:
-            return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else None
+            # 定义时间格式化函数
+            def format_datetime(dt: datetime | None) -> str | None:
+                return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else None
 
-        # 格式化所有指定的 datetime 字段
-        for field in self.datetime_fields_to_format:
-            if field in data and data[field] is not None:
-                data[field] = format_datetime(data[field])
+            # 格式化所有指定的 datetime 字段
+            for field in self.datetime_fields_to_format:
+                if field in data and data[field] is not None:
+                    data[field] = format_datetime(data[field])
 
-        return data
+            return data
+        except Exception as e:
+            logger.error(f"Serialization error: {str(e)}")
+            raise SerializationException(code=500, message=f"Failed to serialize model: {str(e)}")
 
     class Settings:
         """Beanie 配置"""

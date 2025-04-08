@@ -19,7 +19,7 @@ class UserRepository:
         """根据邮箱获取用户"""
         try:
             user = await User.find_one(User.email == email)
-            return user.model_dump() if user else None
+            return user.model_serialize() if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise
@@ -29,7 +29,7 @@ class UserRepository:
         """根据用户 ID 获取用户"""
         try:
             user = await User.find_one(User.user_id == user_id)
-            return user.model_dump() if user else None
+            return user.model_serialize() if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise
@@ -39,7 +39,7 @@ class UserRepository:
         """根据用户展示 ID 获取用户"""
         try:
             user = await User.find_one(User.display_id == display_id)
-            return user.model_dump() if user else None
+            return user.model_serialize() if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise
@@ -50,7 +50,7 @@ class UserRepository:
         try:
             user = User(**user_data)
             await user.create()
-            return user.model_dump()
+            return user.model_serialize()
         except Exception as e:
             logger.error(f"创建用户失败: {e}")
             raise

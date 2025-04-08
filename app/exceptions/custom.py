@@ -24,3 +24,7 @@ class NotFoundException(BaseExceptions):
 class DataBaseException(BaseExceptions):
     """数据库异常"""
     pass
+
+class SerializationException(BaseExceptions):
+    """序列化异常"""
+    pass
