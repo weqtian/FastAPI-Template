@@ -17,3 +17,7 @@ class ErrorCode(Enum):
 
     SERVER_ERROR = 500
 
+
+if __name__ == '__main__':
+    pass
+    # print(ErrorCode.USER_NOT_FOUND.value)

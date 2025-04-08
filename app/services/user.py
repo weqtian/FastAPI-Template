@@ -23,15 +23,26 @@ class UserService:
         self._repo = repo
 
     async def register(self, user_data: RegisterUser) -> RegisterResponse:
-        """ 注册用户 """
+        """
+        注册用户
+        :param user_data: 用户数据
+        :return: 用户信息
+        """
+        email_is_exist = await self._repo.get_user_by_email(user_data.email)
+        if email_is_exist:
+            logger.error(f'该邮箱已注册: {user_data.email}')
+            raise BusinessException(code=ErrorCode.USER_EMAIL_EXIST.value, message="该邮箱已注册")
         try:
-            email_is_exist = await self._repo.get_user_by_email(user_data.email)
-            if email_is_exist:
-                raise BusinessException(code=ErrorCode.USER_EMAIL_EXIST.value, message="该邮箱已注册")
             user_data.password = encrypt_password(user_data.password)
-            user_data.user_id = generate_user_id()
-            user_data.display_id = generate_user_id()
-            user = await self._repo.create({**user_data.model_dump()})
+            user_info = {
+                **user_data.model_dump(),
+                "user_id": generate_user_id(),
+                "display_id": generate_user_id()
+            }
+            logger.info(f"注册用户信息: {user_info}")
+            # 用户信息入库
+            user = await self._repo.create(user_info)
+
             return RegisterResponse(data=user)
         except Exception as e:
             logger.error(f"注册用户异常: {e}")

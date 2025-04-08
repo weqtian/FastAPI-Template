@@ -16,17 +16,49 @@ class UserRepository:
     """ 用户数据库操作封装 """
 
     @staticmethod
-    async def get_user_by_email(email: str) -> list | None:
+    async def get_user_by_email(email: str) -> Dict[str, Any] | None:
         """
         根据邮箱获取用户
         :param email: 用户邮箱
         :return: User对象
         """
         try:
-            user = await User.find(email=email).to_list()
+            user = await User.find_one(User.email==email)
             if not user:
                 return None
-            return serialize_data(user)
+            return user.to_dict(exclude_key={"password"})
+        except Exception as e:
+            logger.error(f"查询用户异常: {e}")
+            raise e
+
+    @staticmethod
+    async def get_user_by_id(user_id: str) -> Dict[str, Any] | None:
+        """
+        根据用户id获取用户
+        :param user_id: 用户id
+        :return: 用户字典
+        """
+        try:
+            user = await User.find_one(User.user_id==user_id)
+            if not user:
+                return None
+            return user.to_dict(exclude_key={"password"})
+        except Exception as e:
+            logger.error(f"查询用户异常: {e}")
+            raise e
+
+    @staticmethod
+    async def get_user_by_display_id(display_id: str) -> Dict[str, Any] | None:
+        """
+        根据用户展示id获取用户
+        :param display_id: 用户展示id
+        :return: 用户字典
+        """
+        try:
+            user = await User.find_one(User.display_id==display_id)
+            if not user:
+                return None
+            return user.to_dict(exclude_key={"password"})
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
             raise e
@@ -36,7 +68,7 @@ class UserRepository:
         """
         创建用户
         :param user_data: 用户数据
-        :return:
+        :return: 用户字典
         """
         try:
             user = User(**user_data)
