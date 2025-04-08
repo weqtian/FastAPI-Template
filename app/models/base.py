@@ -7,26 +7,72 @@
 @Date    ：2025-04-04 19:19:37
 """
 from typing import Dict, Any
+from datetime import datetime
+from pydantic import Field, model_serializer
 from beanie import Document, PydanticObjectId
 
 
 class BaseDocument(Document):
-    """ 基础文档类 """
+    """基础文档类，提供所有模型共用的字段和方法"""
+
+    id: PydanticObjectId = Field(
+        default_factory=PydanticObjectId,
+        alias="_id",
+        description="文档唯一标识符"
+    )
+    is_active: bool = Field(default=True, description="记录是否激活，True 表示激活，False 表示禁用")
+    is_deleted: bool = Field(default=False, description="记录是否逻辑删除，True 表示已删除，False 表示未删除")
+    create_time: int = Field(
+        default_factory=lambda: int(datetime.now().timestamp() * 1000),
+        description="记录创建时间戳（毫秒），表示记录创建的精确时间"
+    )
+    create_date: datetime = Field(
+        default_factory=datetime.now,
+        description="记录创建日期时间，存储为 MongoDB 的 ISODate 类型"
+    )
+    create_by: str = Field(default="system", description="记录创建者标识，通常为用户名或系统标识")
+    last_modify_by: str = Field(default="system", description="最后修改者标识，通常为用户名或系统标识")
+    last_modify_time: int = Field(
+        default_factory=lambda: int(datetime.now().timestamp() * 1000),
+        description="最后修改时间戳（毫秒），表示记录最后更新的精确时间"
+    )
+    last_modify_date: datetime = Field(
+        default_factory=datetime.now,
+        description="最后修改日期时间，存储为 MongoDB 的 ISODate 类型"
+    )
+
+    # 定义基类的 datetime 字段列表，子类可扩展
+    datetime_fields_to_format = ["create_date", "last_modify_date"]
 
     class Config:
-        """ Pydantic 配置 """
+        """Pydantic 配置"""
         json_encoders = {
-            PydanticObjectId: str  # 将 PydanticObjectId 序列化为字符串
+            PydanticObjectId: str
         }
+        arbitrary_types_allowed = True
 
-    def to_dict(self, exclude_key: set[str] = None) -> Dict[str, Any]:
+    @model_serializer
+    def serialize_model(self) -> Dict[str, Any]:
         """
-        将数据转换成字典且自动处理MongoDB的ObjectId类型转换
-        :return: 用户数据字典
+        自定义序列化方法，格式化 datetime 字段并处理脱敏
+        :return: 序列化后的数据字典
         """
-        exclude = {"id"}
-        if exclude_key:
-            exclude.update(exclude_key)
-        data = self.model_dump(exclude=exclude)  # 排除原始 id 字段
-        data["id"] = str(self.id)  # 添加字符串形式的 id
+        # 获取基础数据，排除原始 id
+        data = self.model_dump(exclude={"id"})
+        data["id"] = str(self.id) if self.id else None
+
+        # 定义时间格式化函数
+        def format_datetime(dt: datetime | None) -> str | None:
+            return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else None
+
+        # 格式化所有指定的 datetime 字段
+        for field in self.datetime_fields_to_format:
+            if field in data and data[field] is not None:
+                data[field] = format_datetime(data[field])
+
         return data
+
+    class Settings:
+        """Beanie 配置"""
+        use_state_management = True  # 启用状态管理
+        validate_on_save = True  # 保存时自动验证

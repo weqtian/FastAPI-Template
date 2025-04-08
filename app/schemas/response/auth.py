@@ -6,15 +6,15 @@
 @Author  ：晴天
 @Date    ：2025-04-04 17:42:54
 """
-from typing import Optional, Dict, Any
 from app.schemas.response.base import Base
+from app.schemas.response.user import UserInfo
 
 
 class RegisterResponse(Base):
     """ 注册响应模型 """
     code: int = 200
     message: str = '注册成功'
-    data: Optional[Dict[str, Any]] = None
+    data: UserInfo
 
     class Config:
         json_schema_extra = {

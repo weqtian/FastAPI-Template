@@ -7,6 +7,7 @@
 @Date    ：2025-04-04 17:46:42
 """
 from app.core.logger import logger
+from app.schemas.response.user import UserInfo
 from app.exceptions.error_code import ErrorCode
 from app.schemas.request.auth import RegisterUser
 from app.exceptions.custom import BusinessException
@@ -43,7 +44,7 @@ class UserService:
             # 用户信息入库
             user = await self._repo.create(user_info)
 
-            return RegisterResponse(data=user)
+            return RegisterResponse(data=UserInfo(**user))
         except Exception as e:
             logger.error(f"注册用户异常: {e}")
             raise BusinessException(code=ErrorCode.SERVER_ERROR.value, message="服务器内部异常")
