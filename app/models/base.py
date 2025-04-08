@@ -6,8 +6,8 @@
 @Author  ：晴天
 @Date    ：2025-04-04 19:19:37
 """
-from typing import Dict, Any
 from datetime import datetime
+from typing import Dict, Any, ClassVar
 from pydantic import Field, model_serializer
 from beanie import Document, PydanticObjectId
 
@@ -15,41 +15,23 @@ from beanie import Document, PydanticObjectId
 class BaseDocument(Document):
     """基础文档类，提供所有模型共用的字段和方法"""
 
-    id: PydanticObjectId = Field(
-        default_factory=PydanticObjectId,
-        alias="_id",
-        description="文档唯一标识符"
-    )
+    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id", description="文档唯一标识符")
     is_active: bool = Field(default=True, description="记录是否激活，True 表示激活，False 表示禁用")
     is_deleted: bool = Field(default=False, description="记录是否逻辑删除，True 表示已删除，False 表示未删除")
-    create_time: int = Field(
-        default_factory=lambda: int(datetime.now().timestamp() * 1000),
-        description="记录创建时间戳（毫秒），表示记录创建的精确时间"
-    )
-    create_date: datetime = Field(
-        default_factory=datetime.now,
-        description="记录创建日期时间，存储为 MongoDB 的 ISODate 类型"
-    )
-    create_by: str = Field(default="system", description="记录创建者标识，通常为用户名或系统标识")
-    last_modify_by: str = Field(default="system", description="最后修改者标识，通常为用户名或系统标识")
-    last_modify_time: int = Field(
-        default_factory=lambda: int(datetime.now().timestamp() * 1000),
-        description="最后修改时间戳（毫秒），表示记录最后更新的精确时间"
-    )
-    last_modify_date: datetime = Field(
-        default_factory=datetime.now,
-        description="最后修改日期时间，存储为 MongoDB 的 ISODate 类型"
-    )
+    create_time: int = Field(default_factory=lambda: int(datetime.now().timestamp() * 1000), description="记录创建时间戳（毫秒）")
+    create_date: datetime = Field(default_factory=datetime.now, description="记录创建日期时间，ISODate 类型")
+    create_by: str = Field(default="system", description="记录创建者标识")
+    last_modify_by: str = Field(default="system", description="最后修改者标识")
+    last_modify_time: int = Field(default_factory=lambda: int(datetime.now().timestamp() * 1000), description="最后修改时间戳（毫秒）")
+    last_modify_date: datetime = Field(default_factory=datetime.now, description="最后修改日期时间，ISODate 类型")
 
-    # 定义基类的 datetime 字段列表，子类可扩展
-    datetime_fields_to_format = ["create_date", "last_modify_date"]
+    # 使用 ClassVar 注解，明确这是一个类变量而非字段
+    datetime_fields_to_format: ClassVar[list[str]] = ["create_date", "last_modify_date"]
 
     class Config:
         """Pydantic 配置"""
-        json_encoders = {
-            PydanticObjectId: str
-        }
-        arbitrary_types_allowed = True
+        json_encoders = {PydanticObjectId: str}  # 将 PydanticObjectId 转换为字符串
+        arbitrary_types_allowed = True  # 允许任意类型
 
     @model_serializer
     def serialize_model(self) -> Dict[str, Any]:
