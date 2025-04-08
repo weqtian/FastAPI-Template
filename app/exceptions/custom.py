@@ -28,3 +28,6 @@ class DataBaseException(BaseExceptions):
 class SerializationException(BaseExceptions):
     """序列化异常"""
     pass
+
+class ServiceException(BaseExceptions):
+    """服务异常"""

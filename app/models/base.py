@@ -11,7 +11,7 @@ from datetime import datetime
 from app.core.logger import logger
 from typing import Dict, Any, ClassVar
 from beanie import Document, PydanticObjectId
-from app.exceptions.custom import SerializationException
+from app.exceptions.custom import ServiceException
 
 
 class BaseDocument(Document):
@@ -43,8 +43,7 @@ class BaseDocument(Document):
         :return: 序列化后的数据字典
         """
         try:
-            # 使用 model_dump(mode="python") 获取原始数据
-            data = self.model_dump(mode="python", exclude={"id"})
+            data = self.model_dump(exclude={"id"})
             data["id"] = str(self.id) if self.id else None
 
             # 定义时间格式化函数
@@ -59,7 +58,7 @@ class BaseDocument(Document):
             return data
         except Exception as e:
             logger.error(f"Serialization error: {str(e)}")
-            raise SerializationException(code=500, message=f"Failed to serialize model: {str(e)}")
+            raise ServiceException(code=500, message="服务内部异常")
 
     class Settings:
         """Beanie 配置"""

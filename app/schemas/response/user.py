@@ -19,6 +19,7 @@ class UserInfo(BaseModel):
     gender: int
     birthday: str
     is_active: bool
+    is_deleted: bool
     create_date: str
     last_modify_date: str
     create_by: str
