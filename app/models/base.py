@@ -10,6 +10,7 @@ from pydantic import Field
 from datetime import datetime
 from app.core.logger import logger
 from typing import Dict, Any, ClassVar
+from app.enums.status_code import StatusCode
 from beanie import Document, PydanticObjectId
 from app.exceptions.custom import ServiceException
 
@@ -67,7 +68,8 @@ class BaseDocument(Document):
         except Exception as e:
             # 记录序列化错误日志并抛出自定义异常
             logger.error(f"Serialization error: {str(e)}")
-            raise ServiceException(code=500, message="服务内部异常")
+            raise ServiceException(code=StatusCode.SYSTEM_ERROR.value[0],
+                                   message=StatusCode.SYSTEM_ERROR.value[1])
 
     class Settings:
         """Beanie 配置类。
