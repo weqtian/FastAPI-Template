@@ -7,6 +7,8 @@
 @Date    ：2025-04-04 16:12:37
 """
 from pydantic import Field
+from typing import ClassVar
+from beanie import PydanticObjectId
 from app.models.base import BaseDocument
 
 
@@ -23,8 +25,9 @@ class User(BaseDocument):
     birthday: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$", description="用户生日，格式为 'YYYY-MM-DD'")
     access_token: str | None = Field(default=None, description="用户访问令牌，用于身份验证，可为空", exclude=True) # 敏感字段，序列化时排除
     refresh_token: str | None = Field(default=None, description="用户刷新令牌，用于更新访问令牌，可为空", exclude=True) # 敏感字段，序列化时排除
+    role_id: PydanticObjectId = Field(default=None, description="用户角色ID，用于权限控制，如 'admin'、'user' 等")
 
-    # User 类没有额外的 datetime 字段需要格式化，因此无需扩展 datetime_fields_to_format
+    enforce_field_order: ClassVar[bool] = True  # 启用字段排序
 
     class Settings:
         """Beanie 配置"""
