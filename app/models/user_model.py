@@ -31,6 +31,8 @@ class User(BaseDocument):
     gender: int = Field(..., ge=0, le=2, description="用户性别，0 表示未知，1 表示男，2 表示女")
     # 用户生日，格式为 'YYYY-MM-DD'
     birthday: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$", description="用户生日，格式为 'YYYY-MM-DD'")
+    # 创建IP地址，记录用户创建记录时的 IP 地址
+    create_ip: str | None = Field(default=None, description="创建IP地址，记录用户创建记录时的 IP 地址")
     # 用户角色，用于权限控制，如 'admin'、'user' 等 敏感字段，序列化时排除
     role_id: str | None = Field(default=None, description="用户角色ID，用于权限控制，如 'admin'、'user' 等", exclude=True)
     # 记录激活状态，True 表示记录有效，False 表示记录被禁用

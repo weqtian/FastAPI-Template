@@ -23,10 +23,11 @@ class UserService:
     def __init__(self, repo: UserRepository):
         self._repo = repo
 
-    async def register(self, user_data: RegisterUser) -> RegisterResponse:
+    async def register(self, user_data: RegisterUser, request_info: dict = None) -> RegisterResponse:
         """
         注册用户
         :param user_data: 用户数据
+         :param request_info: 请求信息
         :return: 用户信息
         """
         email_is_exist = await self._repo.get_user_by_email(user_data.email)
@@ -41,7 +42,8 @@ class UserService:
             user_info = {
                 **user_data.model_dump(),
                 "user_id": generate_user_id(),
-                "display_id": generate_user_id()
+                "display_id": generate_user_id(),
+                "create_ip": request_info.get("client_ip", None),
             }
             user = await self._repo.create(user_info)
             return RegisterResponse(data=UserInfo(**user))
