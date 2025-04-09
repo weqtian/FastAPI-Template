@@ -7,7 +7,7 @@
 @Date    ：2025-04-04 16:06:43
 """
 from beanie import init_beanie
-from app.models.user import User
+from app.models.user_model import User
 from app.core.logger import logger
 from app.core.config import config
 from pymongo.errors import  ConnectionFailure, NetworkTimeout

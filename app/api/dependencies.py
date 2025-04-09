@@ -7,7 +7,7 @@
 @Date    ：2025-04-04 16:53:53
 """
 from fastapi import Depends
-from app.services.user import UserService
+from app.services.user_service import UserService
 from app.repositories.user_repo import UserRepository
 
 

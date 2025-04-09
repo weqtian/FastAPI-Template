@@ -8,7 +8,6 @@
 """
 from fastapi import FastAPI
 from app.core.config import config
-from app.core.logger import logger
 from app.api.endpoints.auth import auth_router
 
 

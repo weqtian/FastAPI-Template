@@ -7,8 +7,8 @@
 @Date    ：2025-04-04 17:23:35
 """
 from typing import Dict, Any
-from app.models.user import User
 from app.core.logger import logger
+from app.models.user_model import User
 
 
 class UserRepository:

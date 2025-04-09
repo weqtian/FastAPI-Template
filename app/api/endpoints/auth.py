@@ -7,10 +7,10 @@
 @Date    ：2025-04-04 16:56:42
 """
 from app.core.logger import logger
-from app.services.user import UserService
 from fastapi import APIRouter, Request, Depends
-from app.schemas.request.auth import RegisterUser
 from app.api.dependencies import get_user_service
+from app.schemas.request.auth import RegisterUser
+from app.services.user_service import UserService
 from app.schemas.response.auth import RegisterResponse
 
 

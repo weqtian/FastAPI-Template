@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 """
 @Project ：FAstAPI-Template 
-@File    ：user.py
+@File    ：user_model.py
 @Author  ：晴天
 @Date    ：2025-04-08 14:18:48
 """
