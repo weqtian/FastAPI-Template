@@ -22,7 +22,8 @@ class BaseDocument(Document):
     """
 
     # 文档唯一标识符，使用 PydanticObjectId 类型，映射到 MongoDB 的 _id 字段
-    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id",  description="文档唯一标识符，自动生成的主键，对应 MongoDB 的 _id 字段")
+    id: PydanticObjectId = Field(
+        default_factory=PydanticObjectId, alias="_id",  description="文档唯一标识符，自动生成的主键，对应 MongoDB 的 _id 字段")
 
     # 类变量：需要格式化的 datetime 字段列表，指定哪些字段需要转换为字符串格式
     datetime_fields_to_format: ClassVar[list[str]] = ["create_date", "last_modify_date"]
