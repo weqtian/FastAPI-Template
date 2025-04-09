@@ -6,7 +6,6 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:56:42
 """
-from app.core.logger import logger
 from fastapi import APIRouter, Request, Depends
 from app.api.dependencies import get_user_service
 from app.schemas.request.auth import RegisterUser
