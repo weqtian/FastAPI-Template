@@ -30,15 +30,15 @@ def register_logging_middleware(app: FastAPI):
 
         # 获取请求信息
         request_info = await request_util.get_request_info(request)
-        logger.info(f'Request Info:\t'
-                    f'url: {request_info.url}\t'
-                    f'method: {request_info.method}\t'
-                    f'header: {request_info.headers}\t'
-                    f'query_params: {request_info.query_params}\t'
-                    f'path_params: {request_info.path_params}\t'
-                    f'body: {request_info.body}\t'
-                    f'client_ip: {request_info.client_ip}\t'
-                    f'timestamp: {request_info.timestamp}\t'
+        logger.info(f'Request Info: '
+                    f'url: {request_info.url} '
+                    f'method: {request_info.method} '
+                    f'header: {request_info.headers} '
+                    f'query_params: {request_info.query_params} '
+                    f'path_params: {request_info.path_params} '
+                    f'body: {request_info.body} '
+                    f'client_ip: {request_info.client_ip} '
+                    f'timestamp: {request_info.timestamp} '
                     )
 
         # 继续处理请求
