@@ -6,6 +6,8 @@
 @Author  ：晴天
 @Date    ：2025-04-07 10:29:10
 """
+import time
+from app.core.logger import logger
 from fastapi import FastAPI, Request
 from app.utils.request_util import request_util
 
@@ -24,9 +26,27 @@ def register_logging_middleware(app: FastAPI):
         :param call_next: 下一个中间件或路由处理函数
         :return: 响应对象
         """
+        start_time = time.time()
+
         # 获取请求信息
-        await request_util.get_request_info(request)
+        request_info = await request_util.get_request_info(request)
+        logger.info(f'Request Info:\t'
+                    f'url: {request_info.url}\t'
+                    f'method: {request_info.method}\t'
+                    f'header: {request_info.headers}\t'
+                    f'query_params: {request_info.query_params}\t'
+                    f'path_params: {request_info.path_params}\t'
+                    f'body: {request_info.body}\t'
+                    f'client_ip: {request_info.client_ip}\t'
+                    f'timestamp: {request_info.timestamp}\t'
+                    )
 
         # 继续处理请求
         response = await call_next(request)
+
+        # 计算处理时间
+        process_time = time.time() - start_time
+
+        # 记录响应信息
+        logger.info(f"Response completed: status={response.status_code}, time={process_time:.3f}s")
         return response

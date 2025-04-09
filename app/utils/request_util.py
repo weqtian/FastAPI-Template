@@ -7,11 +7,14 @@
 @Date    ：2025-04-09 18:15:29
 """
 from fastapi import Request
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.logger import logger
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import ServiceException
 from app.schemas.request.request_info import RequestInfo
+
+# 定义需要解析请求体的方法集合
+BODY_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
 
 class RequestUtil:
@@ -22,57 +25,83 @@ class RequestUtil:
         """
         获取完整的请求信息并封装成 RequestInfo 对象
 
-        Args:
-            request: FastAPI 的 Request 对象，包含所有请求相关信息
-
-        Returns:
-            RequestInfo: 封装了请求信息的模型实例
-
-        Raises:
-            HTTPException: 如果处理请求信息时发生严重错误
+        :param request: FastAPI 的 Request 对象，包含所有请求相关信息
+        :return: RequestInfo 对象，封装了请求信息
+        :raises ServiceException: 处理请求信息时发生错误，根据具体情况抛出不同状态码
         """
         try:
             # 初始化请求体变量
             body = None
-            # 对于需要处理请求体的 HTTP 方法
-            if request.method in ["GET", "POST", "PUT", "PATCH"]:
-                try:
-                    # 尝试解析 JSON 格式的请求体
-                    body = await request.json()
-                except Exception:
+            # 仅对需要解析请求体的方法处理
+            if request.method in BODY_METHODS:
+                content_type = request.headers.get("Content-Type", "").lower()
+                if "application/json" in content_type:
                     try:
-                        # 如果不是 JSON，尝试获取原始字节并解码为字符串
-                        body = await request.body()
-                        if isinstance(body, bytes):
-                            body = body.decode("utf-8")
-                    except Exception as e:
-                        # 记录无法解析请求体的警告
-                        logger.warning(f"Failed to parse request body: {e}")
+                        # 尝试解析 JSON 格式的请求体
+                        body = await request.json()
+                    except ValueError as e:
+                        logger.debug(f"Failed to parse JSON body: {e}")
+                        # JSON 解析失败，尝试获取原始数据
+                        body = await RequestUtil._decode_body(request)
+                else:
+                    # 非 JSON 请求，直接获取原始数据
+                    body = await RequestUtil._decode_body(request)
 
-            # 获取客户端 IP 地址，如果无法获取则使用 "unknown"
+            # 获取客户端 IP 地址，处理无客户端的情况
             client_ip = request.client.host if request.client else "unknown"
 
             # 创建并填充 RequestInfo 对象
             request_info = RequestInfo(
-                method=request.method,  # 请求方法
-                url=str(request.url),  # 请求的完整 URL
-                headers=dict(request.headers),  # 请求头字典
-                query_params=dict(request.query_params),  # 查询参数
-                path_params=request.path_params,  # 路径参数
-                body=body,  # 请求体内容
-                client_ip=client_ip,  # 客户端 IP
-                timestamp=datetime.now()  # 当前 UTC 时间
+                method=request.method,
+                url=str(request.url),
+                headers=dict(request.headers),
+                query_params=dict(request.query_params),
+                path_params=request.path_params,
+                body=body,
+                client_ip=client_ip,
+                timestamp=datetime.now(timezone.utc),  # 使用 UTC 时间
             )
 
-            # 记录请求信息到日志
-            logger.info(f"Request received: {request_info.model_dump()}")
+            # 可选：记录请求信息（根据需要启用）
+            # logger.info(f"Request received: {request_info.model_dump()}")
 
             return request_info
 
+        except ValueError as ve:
+            logger.error(f"Invalid request data: {ve}")
+            raise ServiceException(
+                code=StatusCode.BAD_REQUEST.get_code(),
+                message=StatusCode.BAD_REQUEST.get_message(),
+            )
         except Exception as e:
-            # 记录错误并抛出 HTTP 异常
             logger.error(f"Error processing request info: {e}")
-            raise ServiceException(code=StatusCode.SYSTEM_ERROR.value[0], message=StatusCode.SYSTEM_ERROR.value[1])
+            raise ServiceException(
+                code=StatusCode.SYSTEM_ERROR.get_code(),
+                message=StatusCode.SYSTEM_ERROR.get_message(),
+            )
+
+    @staticmethod
+    async def _decode_body(request: Request) -> str | bytes | None:
+        """
+        辅助方法：解码请求体为字符串，处理非 JSON 情况
+
+        :param request: FastAPI 的 Request 对象
+        :return: 解码后的字符串或原始字节
+        :raises ServiceException: 解码失败时抛出异常
+        """
+        try:
+            body = await request.body()
+            if not body:
+                return None  # 空 body 返回 None
+            if isinstance(body, bytes):
+                return body.decode("utf-8", errors="replace")  # 解码失败时替换非法字符
+            return body
+        except Exception as e:
+            logger.warning(f"Unable to decode request body: {e}")
+            raise ServiceException(
+                code=StatusCode.BAD_REQUEST.get_code(),
+                message="Failed to decode request body",
+            )
 
 
 request_util = RequestUtil()

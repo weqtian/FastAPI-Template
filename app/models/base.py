@@ -68,8 +68,9 @@ class BaseDocument(Document):
         except Exception as e:
             # 记录序列化错误日志并抛出自定义异常
             logger.error(f"Serialization error: {str(e)}")
-            raise ServiceException(code=StatusCode.SYSTEM_ERROR.value[0],
-                                   message=StatusCode.SYSTEM_ERROR.value[1])
+            raise ServiceException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                   message=StatusCode.SYSTEM_ERROR.get_message()
+                                   )
 
     class Settings:
         """Beanie 配置类。

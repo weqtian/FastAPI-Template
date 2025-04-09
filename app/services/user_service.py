@@ -33,8 +33,8 @@ class UserService:
         if email_is_exist:
             logger.error(f'该邮箱已注册: {user_data.email}')
             raise BusinessException(
-                code=StatusCode.EMAIL_ALREADY_REGISTERED.value[0],
-                message=StatusCode.EMAIL_ALREADY_REGISTERED.value[1]
+                code=StatusCode.EMAIL_ALREADY_REGISTERED.get_code(),
+                message=StatusCode.EMAIL_ALREADY_REGISTERED.get_message()
             )
         try:
             user_data.password = encrypt_password(user_data.password)
@@ -48,6 +48,6 @@ class UserService:
         except Exception as e:
             logger.error(f"注册用户异常: {e}")
             raise BusinessException(
-                code=StatusCode.SYSTEM_ERROR.value[0],
-                message=StatusCode.SYSTEM_ERROR.value[1]
+                code=StatusCode.SYSTEM_ERROR.get_code(),
+                message=StatusCode.SYSTEM_ERROR.get_message()
             )
