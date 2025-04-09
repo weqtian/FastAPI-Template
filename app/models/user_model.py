@@ -9,23 +9,30 @@
 from pydantic import Field
 from typing import ClassVar
 from datetime import datetime
-from beanie import PydanticObjectId
 from app.models.base import BaseDocument
 
 
 class User(BaseDocument):
     """用户表模型，继承自 BaseDocument"""
 
+    # 邮箱地址
     email: str = Field(..., description="用户邮箱地址，唯一标识用户身份，符合邮箱格式")
-    # 敏感字段，序列化时排除
+    # 用户密码 敏感字段，序列化时排除
     password: str = Field(..., min_length=8, description="用户密码，加密后的哈希值，至少 8 位", exclude=True)
+    # 用户ID，系统生成的唯一标识符
     user_id: str = Field(..., description="用户唯一标识符，系统生成的 ID")
+    # 用户展示 ID，用于前端显示的唯一标识
     display_id: str = Field(..., description="用户展示 ID，用于前端显示的唯一标识")
+    # 用户昵称，展示名称，最多 50 个字符
     nickname: str = Field(..., max_length=50, description="用户昵称，展示名称，最多 50 个字符")
+    # 用户头像文件 URL，指向头像存储位置
     head_file_url: str = Field(..., description="用户头像文件 URL，指向头像存储位置")
+    # 用户性别，0 表示未知，1 表示男，2 表示女
     gender: int = Field(..., ge=0, le=2, description="用户性别，0 表示未知，1 表示男，2 表示女")
+    # 用户生日，格式为 'YYYY-MM-DD'
     birthday: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$", description="用户生日，格式为 'YYYY-MM-DD'")
-    role_id: PydanticObjectId = Field(default=None, description="用户角色ID，用于权限控制，如 'admin'、'user' 等")
+    # 用户角色，用于权限控制，如 'admin'、'user' 等
+    role_id: str = Field(default=None, description="用户角色ID，用于权限控制，如 'admin'、'user' 等")
     # 记录激活状态，True 表示记录有效，False 表示记录被禁用
     is_active: bool = Field(default=True, description="记录是否激活，True 表示激活（有效），False 表示禁用")
     # 逻辑删除标志，True 表示记录已被删除（软删除），False 表示未删除
