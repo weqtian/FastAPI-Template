@@ -7,11 +7,11 @@
 @Date    ：2025-04-04 16:06:43
 """
 from beanie import init_beanie
-from app.models.user_model import User
 from app.core.logger import logger
 from app.core.config import config
-from pymongo.errors import  ConnectionFailure, NetworkTimeout
+from app.models.user_model import User
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import  ConnectionFailure, NetworkTimeout
 
 
 class DataBaseManager:
@@ -30,7 +30,10 @@ class DataBaseManager:
             logger.info("MongoDB Connected Successfully")
 
             logger.info("Started Initializing Beanie Document Models")
-            await init_beanie(database=self._client[config.DB_NAME], document_models=[User])
+            await init_beanie(
+                database=self._client[config.DB_NAME],
+                document_models=[User]
+            )
             logger.info("Finished Initializing Beanie Document Models")
 
         except ConnectionFailure or NetworkTimeout as e:

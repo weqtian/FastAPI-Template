@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from app.core.config import config
 from app.app_lifespan import lifespan
 from app.api.routers import register_routers
+from app.middleware.logging import register_logging_middleware
 from app.exceptions.handlers import register_exception_handlers
 
 
@@ -34,5 +35,8 @@ def create_app() -> FastAPI:
 
     # 注册异常处理器
     register_exception_handlers(app)
+
+    # 注册日志中间件
+    register_logging_middleware(app)
 
     return app

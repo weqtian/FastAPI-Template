@@ -7,6 +7,7 @@
 @Date    ：2025-04-04 16:53:53
 """
 from fastapi import Depends
+from app.utils.request_util import request_util
 from app.services.user_service import UserService
 from app.repositories.user_repo import UserRepository
 
@@ -26,3 +27,11 @@ async def get_user_service(repo: UserRepository = Depends(get_user_repo)) -> Use
     :return: UserService
     """
     return UserService(repo)
+
+
+async def get_request_info() -> request_util:
+    """
+    获取请求信息
+    :return: request_util
+    """
+    return request_util.get_request_info()
