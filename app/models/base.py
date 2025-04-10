@@ -86,5 +86,4 @@ class BaseDocument(Document):
             return {"id": data['id'], **data}
         except Exception as e:
             logger.error(f"Serialization error: {str(e)}")
-            raise ServiceException(code=StatusCode.SYSTEM_ERROR.get_code(),
-                                   message=StatusCode.SYSTEM_ERROR.get_message())
+            raise ServiceException(code=StatusCode.SYSTEM_ERROR.get_code(), message=StatusCode.SYSTEM_ERROR.get_message())
