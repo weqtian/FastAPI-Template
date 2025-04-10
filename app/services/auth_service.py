@@ -9,6 +9,7 @@
 from typing import Dict, Any
 from datetime import datetime
 from app.core.logger import logger
+from app.utils.date_util import date_util
 from app.core.security import jwt_manager
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import BusinessException
@@ -74,8 +75,8 @@ class AuthService:
             payload = {'user_id': user.get('user_id'), 'nickname': user.get('nickname')}
             token = jwt_manager.create_token(payload)
             await self._repo.update_user_by_id(user.get('user_id'), {
-                'last_modify_by': user.get('user_id'), 'last_modify_time': int(datetime.now().timestamp() * 1000),
-                'last_modify_date': datetime.now(), 'access_token': token.access_token, 'refresh_token': token.refresh_token
+                'last_modify_by': user.get('user_id'), 'last_modify_time': date_util.get_now_timestamp(),
+                'last_modify_date': date_util.now(), 'access_token': token.access_token, 'refresh_token': token.refresh_token
             })
             return token.model_dump()
         except Exception as e:
