@@ -16,7 +16,8 @@ from app.exceptions.custom import ServiceException
 
 
 class BaseDocument(Document):
-    """基础文档类，提供所有模型共用的字段和方法。
+    """
+    基础文档类，提供所有模型共用的字段和方法。
 
     该类定义了所有 MongoDB 文档模型的基础字段（如 ID、状态、时间戳等），并提供通用的序列化逻辑。
     子类可以通过继承此类的字段和方法，同时可选择是否调整字段顺序。
@@ -41,21 +42,40 @@ class BaseDocument(Document):
         }
         arbitrary_types_allowed = True  # 允许使用任意类型（如 PydanticObjectId），避免类型检查错误
 
-    def model_serialize(self) -> Dict[str, Any]:
+    class Settings:
+        """
+        Beanie 配置类。
+
+        定义 Beanie ORM 的行为和 MongoDB 相关设置。
+        """
+        use_state_management = True  # 启用 Beanie 的状态管理功能，跟踪文档状态
+        validate_on_save = True  # 在保存文档到 MongoDB 时自动验证数据有效性
+        use_mongo_time = True  # 使用 MongoDB 的 ISODate 类型来存储 datetime 字段
+        collection = "base"  # 设置默认的集合名称，子类可以覆盖此设置
+
+    def model_serialize(self, include_sensitive: bool = False) -> Dict[str, Any]:
         """
         自定义序列化方法，将模型数据转换为字典。
 
-        同时处理 datetime 字段格式化、id 转换为字符串，并包含异常处理。
-
+        :param include_sensitive: 是否包含敏感字段（如 password、access_token 等），默认为 False
         :return: 序列化后的数据字典
         :raises ServiceException: 如果序列化过程中发生异常，抛出服务内部异常
         """
         try:
-            # 获取基础序列化数据，排除 id 字段
-            data = self.model_dump(exclude={"id"})
-            data["id"] = str(self.id) if self.id else None  # 将 PydanticObjectId 转换为字符串
+            # 获取所有字段的原始数据，绕过 exclude=True 的限制
+            data = self.__dict__.copy()
 
-            # 定义时间格式化函数，将 datetime 对象转换为指定格式的字符串
+            # 如果不包含敏感字段，排除标记为 exclude=True 的字段
+            if not include_sensitive:
+                exclude_fields = {field for field, model_field in self.model_fields.items()
+                                  if model_field.exclude}
+                for field in exclude_fields:
+                    data.pop(field, None)
+
+            # 单独处理 id 字段，转换为字符串
+            data["id"] = str(self.id) if self.id else None
+
+            # 定义时间格式化函数
             def format_datetime(dt: datetime | None) -> str | None:
                 return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else None
 
@@ -66,16 +86,6 @@ class BaseDocument(Document):
 
             return {"id": data['id'], **data}
         except Exception as e:
-            # 记录序列化错误日志并抛出自定义异常
             logger.error(f"Serialization error: {str(e)}")
-            raise ServiceException(code=StatusCode.SYSTEM_ERROR.get_code(), message=StatusCode.SYSTEM_ERROR.get_message())
-
-    class Settings:
-        """Beanie 配置类。
-
-        定义 Beanie ORM 的行为和 MongoDB 相关设置。
-        """
-        use_state_management = True  # 启用 Beanie 的状态管理功能，跟踪文档状态
-        validate_on_save = True  # 在保存文档到 MongoDB 时自动验证数据有效性
-        use_mongo_time = True  # 使用 MongoDB 的 ISODate 类型来存储 datetime 字段
-        collection = "base"  # 设置默认的集合名称，子类可以覆盖此设置
+            raise ServiceException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                   message=StatusCode.SYSTEM_ERROR.get_message())

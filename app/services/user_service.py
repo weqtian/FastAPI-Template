@@ -58,12 +58,12 @@ class UserService:
         :param request_info: 请求信息
         :return: 用户信息
         """
-        user_is_exist = await self._repo.get_user_by_email(user_data.email)
+        user_is_exist = await self._repo.get_user_by_email(user_data.email, True)
         if not user_is_exist:
             logger.error(f'该邮箱未注册: {user_data.email}')
             raise BusinessException(code=StatusCode.EMAIL_NOT_REGISTERED.get_code(),
                                     message=StatusCode.EMAIL_NOT_REGISTERED.get_message())
-        password_verify = verify_password(user_data.password, user_is_exist.get('password'))
+        password_verify = verify_password(user_data.password, user_is_exist.get('password', None))
         if not password_verify:
             logger.error(f'账号密码错误: {user_data.email}')
             raise BusinessException(code=StatusCode.USERNAME_OR_PASSWORD_ERROR.get_code(),
