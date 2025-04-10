@@ -6,21 +6,21 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:56:42
 """
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
+from app.schemas.response import Response
 from app.schemas.request.auth import RegisterUser
 from app.services.user_service import UserService
-from app.schemas.response.auth import RegisterResponse
 from app.api.dependencies import get_user_service, get_request_info
 
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@auth_router.post("/register", summary="注册", response_model=RegisterResponse, response_model_exclude_none=True)
+@auth_router.post("/register", summary="注册", response_model=Response, response_model_exclude_none=True)
 async def register(user_data: RegisterUser, request = Depends(get_request_info), user_service: UserService = Depends(get_user_service)):
     """ 注册用户 """
-
-    return await user_service.register(user_data, request)
+    result = await user_service.register(user_data, request)
+    return Response(data=result)
 
 
 @auth_router.post("/login", summary="登录")

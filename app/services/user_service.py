@@ -6,14 +6,13 @@
 @Author  ：晴天
 @Date    ：2025-04-04 17:46:42
 """
+from typing import Dict, Any
 from app.core.logger import logger
 from app.enums.status_code import StatusCode
-from app.schemas.response.user import UserInfo
 from app.schemas.request.auth import RegisterUser
 from app.exceptions.custom import BusinessException
 from app.utils.user_id_util import generate_user_id
 from app.repositories.user_repo import UserRepository
-from app.schemas.response.auth import RegisterResponse
 from app.utils.encrypt_util import encrypt_password
 
 
@@ -23,7 +22,7 @@ class UserService:
     def __init__(self, repo: UserRepository):
         self._repo = repo
 
-    async def register(self, user_data: RegisterUser, request_info: dict = None) -> RegisterResponse:
+    async def register(self, user_data: RegisterUser, request_info: dict = None) -> Dict[str, Any]:
         """
         注册用户
         :param user_data: 用户数据
@@ -46,7 +45,7 @@ class UserService:
                 "create_ip": request_info.get("client_ip", None),
             }
             user = await self._repo.create(user_info)
-            return RegisterResponse(data=UserInfo(**user))
+            return user
         except Exception as e:
             logger.error(f"注册用户异常: {e}")
             raise BusinessException(
