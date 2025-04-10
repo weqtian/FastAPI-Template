@@ -18,17 +18,17 @@ auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @auth_router.post("/register", summary="注册", response_model=Response, response_model_exclude_none=True)
 async def register(user_data: RegisterUser, request = Depends(get_request_info),
-                   user_service: AuthService = Depends(get_auth_service)):
+                   auth_service: AuthService = Depends(get_auth_service)):
     """ 注册用户 """
-    result = await user_service.register(user_data, request)
+    result = await auth_service.register(user_data, request)
     return Response(data=result)
 
 
 @auth_router.post("/login", summary="登录", response_model=Response, response_model_exclude_none=True)
 async def login(user_data: LoginUser, request = Depends(get_request_info),
-                user_service: AuthService = Depends(get_auth_service)):
+                auth_service: AuthService = Depends(get_auth_service)):
     """ 登录用户 """
-    result = await user_service.login(user_data, request)
+    result = await auth_service.login(user_data, request)
     return Response(data=result)
 
 
