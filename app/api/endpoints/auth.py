@@ -25,10 +25,9 @@ async def register(user_data: RegisterUser, request = Depends(get_request_info),
 
 
 @auth_router.post("/login", summary="登录", response_model=Response, response_model_exclude_none=True)
-async def login(user_data: LoginUser, request = Depends(get_request_info),
-                auth_service: AuthService = Depends(get_auth_service)):
+async def login(user_data: LoginUser, auth_service: AuthService = Depends(get_auth_service)):
     """ 登录用户 """
-    result = await auth_service.login(user_data, request)
+    result = await auth_service.login(user_data)
     return Response(data=result)
 
 

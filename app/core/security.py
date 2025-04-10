@@ -13,38 +13,39 @@ from datetime import datetime, timedelta
 from jwt import encode, decode, PyJWTError
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import AuthException
-from app.schemas.security import DecodeTokenData
+from app.schemas.security import DecodeTokenData, TokenData
 
 
-class JWTCore:
-    """ JWT核心类 """
+class JWTManager:
+    """ JWT管理类 """
 
     def __init__(self):
         """ 初始化 """
         self.secret_key = config.PROJECT_SECRET_KEY
         self.algorithm = config.PROJECT_ALGORITHM
 
-    def create_access_token(self, data: Dict[str, Any]) -> str:
+    def create_token(self, data: Dict[str, Any]) -> TokenData:
         """
-        创建访问token
+        创建token
         :param data: 数据
-        :return: token
+        :return: TokenData
         """
-        to_encode = data.copy()
-        expire = datetime.now() + timedelta(days=config.PROJECT_ACCESS_TOKEN_EXPIRE_DAYS)
-        to_encode.update({"exp": expire, "type": "access"})
-        return encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        copy_data = data.copy()
+        access_token_expire = datetime.now() + timedelta(days=config.PROJECT_ACCESS_TOKEN_EXPIRE_DAYS)
+        refresh_token_expire = datetime.now() + timedelta(days=config.PROJECT_REFRESH_TOKEN_EXPIRE_DAYS)
+        copy_data.update({"exp": access_token_expire, "type": "access"})
+        access_token = encode(payload=copy_data, key=self.secret_key, algorithm=self.algorithm)
+        copy_data.update({"exp": refresh_token_expire, "type": "refresh"})
+        refresh_token = encode(payload=copy_data, key=self.secret_key, algorithm=self.algorithm)
 
-    def create_refresh_token(self, data: Dict[str, Any]) -> str:
-        """
-        创建刷新token
-        :param data: 数据
-        :return: token
-        """
-        to_encode = data.copy()
-        expire = datetime.now() + timedelta(days=config.PROJECT_REFRESH_TOKEN_EXPIRE_DAYS)
-        to_encode.update({"exp": expire, "type": "refresh"})
-        return encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        return TokenData(
+            access_token=access_token,
+            token_type="bearer",
+            refresh_token=refresh_token,
+            expire=int(access_token_expire.timestamp() * 1000),
+            user_id=data.get("user_id"),
+            nickname=data.get("nickname")
+        )
 
     def decode_token(self, token: str) -> DecodeTokenData:
         """
@@ -62,4 +63,4 @@ class JWTCore:
             raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(), message='Token validation failed')
 
 
-jwt_core = JWTCore()
+jwt_manager = JWTManager()

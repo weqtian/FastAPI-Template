@@ -8,6 +8,7 @@
 """
 from typing import Dict, Any
 from app.core.logger import logger
+from app.core.security import jwt_manager
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import BusinessException
 from app.utils.user_id_util import generate_user_id
@@ -49,21 +50,27 @@ class AuthService:
             raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
                                     message=StatusCode.SYSTEM_ERROR.get_message())
 
-    async def login(self, user_data: LoginUser, request_info: dict = None) -> Dict[str, Any]:
+    async def login(self, user_data: LoginUser) -> Dict[str, Any]:
         """
         登录
         :param user_data: 用户数据
-        :param request_info: 请求信息
         :return: 用户信息
         """
-        user_is_exist = await self._repo.get_user_by_email(user_data.email, True)
-        if not user_is_exist:
+        user = await self._repo.get_user_by_email(user_data.email, True)
+        if not user:
             logger.error(f'该邮箱未注册: {user_data.email}')
             raise BusinessException(code=StatusCode.EMAIL_NOT_REGISTERED.get_code(),
                                     message=StatusCode.EMAIL_NOT_REGISTERED.get_message())
-        password_verify = verify_password(user_data.password, user_is_exist.get('password', None))
+        password_verify = verify_password(user_data.password, user.get('password', None))
         if not password_verify:
             logger.error(f'账号密码错误: {user_data.email}')
             raise BusinessException(code=StatusCode.USERNAME_OR_PASSWORD_ERROR.get_code(),
                                     message=StatusCode.USERNAME_OR_PASSWORD_ERROR.get_message())
-        return {**request_info}
+        try:
+            payload = {'user_id': user.get('user_id'), 'nickname': user.get('nickname')}
+            token = jwt_manager.create_token(payload)
+            return token.model_dump()
+        except Exception as e:
+            logger.error(f"创建token异常: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
