@@ -42,8 +42,9 @@ class Config(BaseSettings):
     PROJECT_OPENAPI_URL: str = os.getenv("PROJECT_OPENAPI_URL", "/openapi.json")
     PROJECT_API_PREFIX: str = os.getenv("PROJECT_API_PREFIX", "/api")
     PROJECT_SECRET_KEY: str = os.getenv("PROJECT_SECRET_KEY", "secret_key")
-    PROJECT_ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("PROJECT_ACCESS_TOKEN_EXPIRE_MINUTES", 30))
-    PROJECT_REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("PROJECT_REFRESH_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
+    PROJECT_ALGORITHM: str = os.getenv("PROJECT_ALGORITHM", "HS256")
+    PROJECT_ACCESS_TOKEN_EXPIRE_DAYS: int = int(os.getenv("PROJECT_ACCESS_TOKEN_EXPIRE_DAYS", 7))
+    PROJECT_REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("PROJECT_REFRESH_TOKEN_EXPIRE_DAYS", 60 * 24 * 7))
 
     # ================================== 路径配置 ==================================#
     LOG_DIR: str = os.path.join(BASE_DIR, "logs")

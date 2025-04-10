@@ -46,10 +46,8 @@ class UserService:
             return user
         except Exception as e:
             logger.error(f"注册用户异常: {e}")
-            raise BusinessException(
-                code=StatusCode.SYSTEM_ERROR.get_code(),
-                message=StatusCode.SYSTEM_ERROR.get_message()
-            )
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
 
     async def login(self, user_data: LoginUser, request_info: dict = None) -> Dict[str, Any]:
         """

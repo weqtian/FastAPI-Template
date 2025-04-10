@@ -6,6 +6,7 @@
 @Author  ：晴天
 @Date    ：2025-04-04 21:29:01
 """
+import traceback
 from app.core.logger import logger
 from fastapi.responses import JSONResponse
 from fastapi import Request, FastAPI, status
@@ -29,7 +30,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         :param exc: 自定义业务异常实例
         :return: JSON响应
         """
-        logger.error(f"BaseExceptions -> code: {exc.code} message: {exc.message}")
+        logger.error(f"baseExceptions -> code: {exc.code} message: {exc.message}")
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={"code": exc.code, "message": exc.message}
@@ -73,7 +74,8 @@ def register_exception_handlers(app: FastAPI) -> None:
         :param exc: 未捕获的异常实例
         :return: JSON响应
         """
-        logger.error(f"Unhandled Exception -> {str(exc)}")
+        stack_trace = ''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        logger.error(f"handlerException -> {str(exc)}\nStack Trace:\n{stack_trace}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "message": "服务器内部错误"}

@@ -13,6 +13,9 @@ class BusinessException(BaseExceptions):
     """通用业务异常"""
     pass
 
+class AuthException(BaseExceptions):
+    """认证异常"""
+
 class ValidationException(BaseExceptions):
     """参数验证异常"""
     pass
