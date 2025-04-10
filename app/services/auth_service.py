@@ -16,7 +16,7 @@ from app.utils.encrypt_util import encrypt_password, verify_password
 from app.schemas.request.auth import RegisterUser, LoginUser
 
 
-class UserService:
+class AuthService:
     """ 用户服务 """
 
     def __init__(self, repo: UserRepository):

@@ -9,7 +9,7 @@
 from typing import Dict, Any
 from fastapi import Request, Depends
 from app.utils.request_util import request_util
-from app.services.auth_service import UserService
+from app.services.auth_service import AuthService
 from app.repositories.user_repo import UserRepository
 
 
@@ -21,13 +21,13 @@ async def get_user_repo() -> UserRepository:
     return UserRepository()
 
 
-async def get_user_service(repo: UserRepository = Depends(get_user_repo)) -> UserService:
+async def get_auth_service(repo: UserRepository = Depends(get_user_repo)) -> AuthService:
     """
-    获取用户服务实例
+    获取授权服务实例
     :param repo: 用户数据库操作实例
     :return: UserService
     """
-    return UserService(repo)
+    return AuthService(repo)
 
 
 async def get_request_info(request: Request) -> Dict[str, Any]:
