@@ -67,8 +67,7 @@ class BaseDocument(Document):
 
             # 如果不包含敏感字段，排除标记为 exclude=True 的字段
             if not include_sensitive:
-                exclude_fields = {field for field, model_field in self.model_fields.items()
-                                  if model_field.exclude}
+                exclude_fields = {field for field, model_field in self.model_fields.items() if model_field.exclude}
                 for field in exclude_fields:
                     data.pop(field, None)
 
