@@ -7,6 +7,7 @@
 @Date    ：2025-04-04 17:46:42
 """
 from typing import Dict, Any
+from datetime import datetime
 from app.core.logger import logger
 from app.core.security import jwt_manager
 from app.enums.status_code import StatusCode
@@ -37,11 +38,14 @@ class AuthService:
                                     message=StatusCode.EMAIL_ALREADY_REGISTERED.get_message())
         try:
             user_data.password = encrypt_password(user_data.password)
+            user_id = generate_user_id()
+            display_id = generate_user_id()
             user_info = {
                 **user_data.model_dump(),
-                "user_id": generate_user_id(),
-                "display_id": generate_user_id(),
+                "user_id": user_id,
+                "display_id": display_id,
                 "create_ip": request_info.get("client_ip", None),
+                'create_by': user_id,
             }
             user = await self._repo.create(user_info)
             return user
@@ -69,8 +73,12 @@ class AuthService:
         try:
             payload = {'user_id': user.get('user_id'), 'nickname': user.get('nickname')}
             token = jwt_manager.create_token(payload)
+            await self._repo.update_user_by_id(user.get('user_id'), {
+                'last_modify_by': user.get('user_id'), 'last_modify_time': int(datetime.now().timestamp() * 1000),
+                'last_modify_date': datetime.now(), 'access_token': token.access_token, 'refresh_token': token.refresh_token
+            })
             return token.model_dump()
         except Exception as e:
-            logger.error(f"创建token异常: {e}")
+            logger.error(f"登录用户异常: {e}")
             raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
                                     message=StatusCode.SYSTEM_ERROR.get_message())

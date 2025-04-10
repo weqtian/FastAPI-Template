@@ -73,3 +73,21 @@ class UserRepository:
         except Exception as e:
             logger.error(f"创建用户失败: {e}")
             raise
+
+    @staticmethod
+    async def update_user_by_id(user_id: str, user_data: Dict[str, Any]) -> Dict[str, Any] | None:
+        """
+        根据用户ID更新用户
+        :param user_id: 用户ID
+        :param user_data: 用户数据
+        :return: 用户信息
+        """
+        try:
+            user = await User.find_one(User.user_id == user_id)
+            if not user:
+                return None
+            await user.set(user_data)
+            return user.model_serialize()
+        except Exception as e:
+            logger.error(f"更新用户失败: {e}")
+            raise
