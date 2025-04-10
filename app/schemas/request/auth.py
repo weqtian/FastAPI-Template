@@ -111,3 +111,44 @@ class RegisterUser(BaseModel):
             }
 
         }
+
+
+class LoginUser(BaseModel):
+    """ 登录用户 """
+
+    email: str
+    password: str
+
+    @field_validator('email')
+    def check_email(cls, v: str):
+        """
+        验证邮箱地址
+        :param v: 邮箱地址
+        :return: 通过验证的合法邮箱地址
+        """
+        if not v:
+            raise ValidationException(code=status.HTTP_400_BAD_REQUEST, message='邮箱地址不能为空')
+        if not data_validation.is_valid_email(v):
+            raise ValidationException(code=status.HTTP_400_BAD_REQUEST, message='邮箱地址格式不正确')
+        return v.lower()
+
+    @field_validator('password')
+    def check_password(cls, v: str):
+        """
+        验证密码
+        :param v: 密码
+        :return: 通过验证的合法密码
+        """
+        if not v:
+            raise ValidationException(code=status.HTTP_400_BAD_REQUEST, message='密码不能为空')
+        if not data_validation.check_string_length(v, min_length=6, max_length=40):
+            raise ValidationException(code=status.HTTP_400_BAD_REQUEST, message='密码长度必须在6到40个字符之间')
+        return v
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                "email": "weqtian@outlook.com",
+                "password": "111111",
+            }
+        }
