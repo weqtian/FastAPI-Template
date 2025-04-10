@@ -8,7 +8,7 @@
 """
 from fastapi import APIRouter, Depends
 from app.schemas.response import Response
-from app.services.user_service import UserService
+from app.services.auth_service import UserService
 from app.api.dependencies import get_user_service, get_request_info
 from app.schemas.request.auth import RegisterUser, LoginUser
 

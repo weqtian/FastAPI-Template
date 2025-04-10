@@ -9,7 +9,7 @@
 from typing import Dict, Any
 from fastapi import Request, Depends
 from app.utils.request_util import request_util
-from app.services.user_service import UserService
+from app.services.auth_service import UserService
 from app.repositories.user_repo import UserRepository
 
 
