@@ -32,6 +32,8 @@ def register_logging_middleware(app: FastAPI):
         request_info = await request_util.get_request_info(request)
         logger.info(f'Request Info: '
                     f'url: {request_info.url} '
+                    f'path: {request_info.path} '
+                    f'host: {request_info.host}'
                     f'method: {request_info.method} '
                     f'header: {request_info.headers} '
                     f'query_params: {request_info.query_params} '

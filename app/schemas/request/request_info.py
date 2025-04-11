@@ -18,6 +18,8 @@ class RequestInfo(BaseModel):
 
     method: str  # HTTP 请求方法（如 GET, POST）
     url: str  # 完整的请求 URL
+    path: str  # 请求路径
+    host: str  # 请求主机
     headers: Dict[str, str]  # 请求头信息
     query_params: Dict[str, Any]  # URL 查询参数
     path_params: Dict[str, Any]  # 路径参数

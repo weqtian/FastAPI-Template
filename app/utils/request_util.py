@@ -8,10 +8,11 @@
 """
 from fastapi import Request
 from app.core.logger import logger
-from datetime import datetime, timezone
+from app.utils.date_util import date_util
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import ServiceException
 from app.schemas.request.request_info import RequestInfo
+
 
 # 定义需要解析请求体的方法集合
 BODY_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -49,21 +50,20 @@ class RequestUtil:
 
             # 获取客户端 IP 地址，处理无客户端的情况
             client_ip = request.client.host if request.client else "unknown"
-
+            logger.info(f'path: {request.url.path}')
             # 创建并填充 RequestInfo 对象
             request_info = RequestInfo(
                 method=request.method,
                 url=str(request.url),
+                path=request.url.path,
+                host=client_ip,
                 headers=dict(request.headers),
                 query_params=dict(request.query_params),
                 path_params=request.path_params,
                 body=body,
                 client_ip=client_ip,
-                timestamp=datetime.now(timezone.utc),  # 使用 UTC 时间
+                timestamp=date_util.now(),  # 使用 UTC 时间
             )
-
-            # 可选：记录请求信息（根据需要启用）
-            # logger.info(f"Request received: {request_info.model_dump()}")
 
             return request_info
 
