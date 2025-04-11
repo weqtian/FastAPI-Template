@@ -66,6 +66,9 @@ class User(BaseDocument):
             "email",
             "user_id",
             "display_id",
-            [("email", 1), ("user_id", 1)]  # 复合索引
+            [("email", 1), ("user_id", 1)],  # 复合索引
+            [("create_date", -1)],  # 按创建时间降序
+            [("is_active", 1)],  # 按激活状态查询
+            [("is_deleted", 1)],  # 按删除状态查询
         ]
         use_state_management = True  # 启用状态管理

@@ -18,7 +18,7 @@ def get_server_id():
     return str(socket.gethostname()).encode('utf-8')
 
 
-def generate_user_id() -> str:
+def generate_id() -> str:
     """
     生成用户ID
     :return: 返回用户ID
@@ -40,6 +40,22 @@ def generate_user_id() -> str:
     user_id = int(hash_hex, 16) % 10 ** 10  # 取模确保ID为10位数字
 
     return str(user_id)
+
+
+def generate_user_id() -> str:
+    """
+    生成用户ID
+    :return: 返回用户ID
+    """
+    return generate_id()
+
+
+def generate_display_id() -> str:
+    """
+    生成用户ID
+    :return: 返回用户ID
+    """
+    return generate_id()
 
 
 if __name__ == '__main__':

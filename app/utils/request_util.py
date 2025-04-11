@@ -50,7 +50,6 @@ class RequestUtil:
 
             # 获取客户端 IP 地址，处理无客户端的情况
             client_ip = request.client.host if request.client else "unknown"
-            logger.info(f'path: {request.url.path}')
             # 创建并填充 RequestInfo 对象
             request_info = RequestInfo(
                 method=request.method,
