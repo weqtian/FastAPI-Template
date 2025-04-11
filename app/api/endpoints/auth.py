@@ -6,10 +6,12 @@
 @Author  ：晴天
 @Date    ：2025-04-04 16:56:42
 """
+from typing import Annotated
 from fastapi import APIRouter, Depends
 from app.schemas.response import Response
+from app.schemas.security import DecodeTokenData
 from app.services.auth_service import AuthService
-from app.api.dependencies import get_auth_service, get_request_info
+from app.api.dependencies import get_auth_service, get_request_info, get_current_user
 from app.schemas.request.auth import RegisterUser, LoginUser
 
 
@@ -31,7 +33,7 @@ async def login(user_data: LoginUser, auth_service: AuthService = Depends(get_au
     return Response(data=result)
 
 
-@auth_router.post("/logout", summary="退出登录")
-async def logout():
-
-    return {"message": "logout"}
+@auth_router.post("/logout", summary="退出登录", response_model=Response, response_model_exclude_none=True)
+async def logout(current_user: Annotated[DecodeTokenData, Depends(get_current_user)]):
+    """ 退出登录 """
+    return Response(data=current_user.model_dump())

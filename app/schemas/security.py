@@ -26,3 +26,4 @@ class DecodeTokenData(BaseModel):
 
     user_id: str = Field(..., description="用户id")
     nickname: str = Field(..., description="用户昵称")
+    type: str = Field(..., description="token类型")

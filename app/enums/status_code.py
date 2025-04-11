@@ -57,12 +57,16 @@ class StatusCode(Enum):
     CAPTCHA_EXPIRED = (10010, "验证码已过期")
     # 邮箱未注册
     EMAIL_NOT_REGISTERED = (10011, "邮箱未注册")
+    # Header缺少 Authorization字段
+    HEADER_MISSING_AUTHORIZATION = (10016, "Header缺少 Authorization字段")
     # Token 无效
     TOKEN_INVALID = (10012, "Token 无效")
     # Token 已过期
     TOKEN_EXPIRED = (10013, "Token 已过期")
+    # 请使用access类型的Token进行访问
+    TOKEN_TYPE_ERROR = (10014, "请使用access类型的Token进行访问")
     # 用户已存在
-    USER_ALREADY_EXIST = (10014, "用户已存在")
+    USER_ALREADY_EXIST = (10015, "用户已存在")
 
     # ================================== 系统模块 状态码：500-999 ==================================
     # 系统错误（HTTP 500）

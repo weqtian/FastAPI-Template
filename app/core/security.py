@@ -56,11 +56,13 @@ class JWTManager:
         try:
             payload = decode(token, self.secret_key, algorithms=[self.algorithm])
             if payload is None or payload.get("user_id") is None:
-                raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(), message=StatusCode.TOKEN_INVALID.get_message())
+                raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(),
+                                    message=StatusCode.TOKEN_INVALID.get_message())
             return DecodeTokenData(**payload)
         except PyJWTError as e:
             logger.error('Token decode failed: {}'.format(e))
-            raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(), message='Token validation failed')
+            raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(),
+                                message=StatusCode.TOKEN_INVALID.get_message())
 
 
 jwt_manager = JWTManager()
