@@ -62,7 +62,7 @@ class RequestUtil:
                 path_params=request.path_params,
                 body=body,
                 client_ip=client_ip,
-                timestamp=date_util.now(),  # 使用 UTC 时间
+                timestamp=date_util.to_iso_format(date_util.now()),  # 使用 UTC 时间
             )
 
             return request_info

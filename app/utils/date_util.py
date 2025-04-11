@@ -19,7 +19,7 @@ class DateUtil:
     DEFAULT_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     DEFAULT_DATE_FORMAT = "%Y-%m-%d"
     DEFAULT_TIME_FORMAT = "%H:%M:%S"
-    ISO_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
+    ISO_FORMAT = "%Y-%m-%dT%H:%M:%S%z"  # 2025-04-11T16:43:08.977299
 
     @staticmethod
     def now(tz: Optional[timezone] = None) -> datetime:

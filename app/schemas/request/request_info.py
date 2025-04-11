@@ -25,4 +25,4 @@ class RequestInfo(BaseModel):
     path_params: Dict[str, Any]  # 路径参数
     body: Optional[Any] = None  # 请求体内容（可选）
     client_ip: str  # 客户端 IP 地址
-    timestamp: datetime  # 请求时间戳
+    timestamp: str  # 请求时间戳
