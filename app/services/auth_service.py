@@ -11,6 +11,7 @@ from typing import Dict, Any, Callable
 from app.utils.date_util import date_util
 from app.core.security import jwt_manager
 from app.enums.status_code import StatusCode
+from app.schemas.security import DecodeTokenData
 from app.exceptions.custom import BusinessException
 from app.repositories.user_repo import UserRepository
 from app.utils.encrypt_util import encrypt_password, verify_password
@@ -110,5 +111,22 @@ class AuthService:
             return token.model_dump()
         except Exception as e:
             logger.error(f"登录用户异常: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
+
+    async def logout(self, current_user: DecodeTokenData):
+        """
+        退出登录
+        :param current_user: 当前用户
+        :return: 用户信息
+        """
+        try:
+            await self._repo.update_user_by_id(current_user.user_id, {
+                'last_modify_by': current_user.user_id, 'last_modify_time': date_util.get_now_timestamp(),
+                'last_modify_date': date_util.now(), 'access_token': None, 'refresh_token': None
+            })
+            return True
+        except Exception as e:
+            logger.error(f"退出登录异常: {e}")
             raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
                                     message=StatusCode.SYSTEM_ERROR.get_message())

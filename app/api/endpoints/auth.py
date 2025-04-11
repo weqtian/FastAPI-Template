@@ -34,6 +34,8 @@ async def login(user_data: LoginUser, auth_service: AuthService = Depends(get_au
 
 
 @auth_router.post("/logout", summary="退出登录", response_model=Response, response_model_exclude_none=True)
-async def logout(current_user: Annotated[DecodeTokenData, Depends(get_current_user)]):
+async def logout(current_user: Annotated[DecodeTokenData, Depends(get_current_user)],
+                 auth_service: AuthService = Depends(get_auth_service)):
     """ 退出登录 """
-    return Response(data=current_user.model_dump())
+    await auth_service.logout(current_user)
+    return Response()
