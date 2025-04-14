@@ -36,7 +36,6 @@ class DatabaseManager:
                 recreate_views=True,  # 确保视图一致性
             )
             logger.info("Beanie ODM initialization successful")
-            self._beanie_initialize_status = True
         except Exception as e:
             logger.error(f"Beanie ODM initialization failed: {str(e)}")
             raise
