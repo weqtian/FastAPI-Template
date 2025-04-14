@@ -62,6 +62,7 @@ class Config(BaseSettings):
     DB_PASSWORD: str = quote_plus(os.getenv("DB_PASSWORD", "123456"))
     DB_NAME: str = os.getenv("DB_NAME", "fastapi_template")
     DB_URI: str = f'mongodb://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}?authSource=admin'
+    DB_MAX_CONNECTIONS: int = os.getenv("DB_MAX_CONNECTIONS", 50)
 
 
 class DevelopmentConfig(Config):

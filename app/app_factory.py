@@ -32,10 +32,8 @@ def create_app() -> FastAPI:
 
     # 注册路由
     register_routers(app)
-
     # 注册异常处理器
     register_exception_handlers(app)
-
     # 注册日志中间件
     register_logging_middleware(app)
 

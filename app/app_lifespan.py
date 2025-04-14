@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from app.core.logger import logger
 from app.core.config import config
 from contextlib import asynccontextmanager
-from app.database.mongodb_connet import mongodb_manager
+from app.database.mongodb_con import mongodb_manager
 
 
 @asynccontextmanager
@@ -20,13 +20,18 @@ async def lifespan(app: FastAPI):
     :param app: FastAPI实例
     :return: None
     """
+    logger.info(f"Application startup, current environment: {config.PROJECT_ENV}")
     try:
-        logger.info(f"Application Starting Lifespan Initializing Current Environment: {config.PROJECT_ENV}")
-        await mongodb_manager.connect()
-        logger.info("Application Lifespan Initialization Completed")
-        yield
+        await mongodb_manager.connect()  # 初始化数据库连接
+        logger.info("Application life cycle initialization successful")
+        yield  # 应用运行期间
     except Exception as e:
-        logger.error(f"Application Lifespan Initialization Fail: {e}")
+        logger.error(f"Lifecycle initialization failed: {str(e)}")
         raise
     finally:
-        await mongodb_manager.disconnect()
+        try:
+            await mongodb_manager.disconnect()  # 清理数据库连接
+            logger.info("Application life cycle shutdown completed")
+        except Exception as e:
+            logger.error(f"An error occurred while closing the app: {str(e)}")
+            raise
