@@ -25,7 +25,7 @@ class UserRepository:
         :return: 用户信息
         """
         try:
-            user = await User.find_one(User.email == email)
+            user = await User.find_one(User.email == email, User.is_deleted == False)
             return user.model_serialize(include_sensitive=include_sensitive) if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
@@ -40,7 +40,7 @@ class UserRepository:
         :return: 用户信息
         """
         try:
-            user = await User.find_one(User.user_id == user_id)
+            user = await User.find_one(User.user_id == user_id, User.is_deleted == False)
             return user.model_serialize(include_sensitive=include_sensitive) if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
@@ -55,7 +55,7 @@ class UserRepository:
         :return: 用户信息
         """
         try:
-            user = await User.find_one(User.display_id == display_id)
+            user = await User.find_one(User.display_id == display_id, User.is_deleted == False)
             return user.model_serialize(include_sensitive=include_sensitive) if user else None
         except Exception as e:
             logger.error(f"查询用户异常: {e}")
@@ -85,7 +85,7 @@ class UserRepository:
         :return: 用户信息
         """
         try:
-            user = await User.find_one(User.user_id == user_id)
+            user = await User.find_one(User.user_id == user_id, User.is_deleted == False)
             if not user:
                 return None
             await user.set(user_data)

@@ -8,9 +8,10 @@
 """
 from fastapi import APIRouter, Depends
 from app.schemas.response import Response
-# from app.schemas.request.user import Pagination
+from app.enums.status_code import StatusCode
 from app.schemas.security import DecodeTokenData
 from app.services.user_service import UserService
+from app.exceptions.custom import BusinessException
 from app.api.dependencies import get_current_user, get_user_service
 
 
@@ -31,4 +32,16 @@ async def get_user_list(
         user_service: UserService = Depends(get_user_service)):
     """ 获取用户列表 """
     result = await user_service.get_user_pagination_list(page=page, page_size=page_size, sort_by=sort_by)
+    return Response(data=result)
+
+
+@user_router.get('/get-user', summary='获取用户信息', response_model=Response, response_model_exclude_none=True)
+async def get_user(user_id: str, _: DecodeTokenData = Depends(get_current_user),
+                   user_service: UserService = Depends(get_user_service)):
+    """ 获取用户信息 """
+    if not user_id:
+        raise BusinessException(code=StatusCode.USER_ID_NOT_NULL.get_code(),
+                                message=StatusCode.USER_ID_NOT_NULL.get_message())
+
+    result = await user_service.get_user_info(user_id=user_id)
     return Response(data=result)

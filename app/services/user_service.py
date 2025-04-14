@@ -6,13 +6,12 @@
 @Author  ：晴天
 @Date    ：2025-04-14 14:49:09
 """
-from typing import Any, Dict, List
+from typing import Any, Dict
 from app.core.logger import logger
+from beanie.odm.enums import SortDirection
 from app.enums.status_code import StatusCode
 from app.exceptions.custom import BusinessException
 from app.repositories.user_repo import UserRepository
-from beanie.odm.enums import SortDirection
-from app.schemas.request.user import Pagination
 
 
 class UserService:

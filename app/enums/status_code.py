@@ -67,6 +67,8 @@ class StatusCode(Enum):
     TOKEN_TYPE_ERROR = (10014, "请使用access类型的Token进行访问")
     # 用户已存在
     USER_ALREADY_EXIST = (10015, "用户已存在")
+    # 用户ID不能为空
+    USER_ID_NOT_NULL = (10017, "用户ID不能为空")
 
     # ================================== 系统模块 状态码：500-999 ==================================
     # 系统错误（HTTP 500）
