@@ -54,7 +54,12 @@ class AuthService:
          :param request_info: 请求信息
         :return: 用户信息
         """
-        email_is_exist = await self._repo.get_user_by_email(user_data.email)
+        try:
+            email_is_exist = await self._repo.get_user_by_email(user_data.email)
+        except Exception as e:
+            logger.error(f"根据邮箱获取用户异常: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
         if email_is_exist:
             logger.error(f'该邮箱已注册: {user_data.email}')
             raise BusinessException(code=StatusCode.EMAIL_ALREADY_REGISTERED.get_code(),
@@ -91,11 +96,17 @@ class AuthService:
         :param user_data: 用户数据
         :return: 用户信息
         """
-        user = await self._repo.get_user_by_email(user_data.email, True)
+        try:
+            user = await self._repo.get_user_by_email(user_data.email, True)
+        except Exception as e:
+            logger.error(f"根据邮箱获取用户异常: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
         if not user:
             logger.error(f'该邮箱未注册: {user_data.email}')
             raise BusinessException(code=StatusCode.EMAIL_NOT_REGISTERED.get_code(),
                                     message=StatusCode.EMAIL_NOT_REGISTERED.get_message())
+
         password_verify = verify_password(user_data.password, user.get('password', None))
         if not password_verify:
             logger.error(f'账号密码错误: {user_data.email}')
@@ -141,10 +152,17 @@ class AuthService:
         if refresh_token.type != 'refresh':
             raise BusinessException(code=StatusCode.TOKEN_INVALID.get_code(),
                                     message=StatusCode.TOKEN_INVALID.get_message())
-        user = await self._repo.get_user_by_id(refresh_token.user_id, True)
+
+        try:
+            user = await self._repo.get_user_by_id(refresh_token.user_id, True)
+        except Exception as e:
+            logger.error(f"根据用户ID获取用户: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
         if not user or token.refresh_token != user.get('refresh_token'):
             raise BusinessException(code=StatusCode.TOKEN_INVALID.get_code(),
                                     message=StatusCode.TOKEN_INVALID.get_message())
+
         try:
             payload = {'user_id': refresh_token.user_id, 'nickname': refresh_token.nickname}
             new_token = jwt_manager.create_token(payload)
