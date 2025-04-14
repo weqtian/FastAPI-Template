@@ -16,7 +16,7 @@ from app.exceptions.custom import BusinessException
 from app.repositories.user_repo import UserRepository
 from app.utils.encrypt_util import encrypt_password, verify_password
 from app.utils.user_id_util import generate_user_id, generate_display_id
-from app.schemas.request.auth import RegisterUser, LoginUser
+from app.schemas.request.auth import RegisterUser, LoginUser, RefreshToken
 
 
 class AuthService:
@@ -114,7 +114,7 @@ class AuthService:
             raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
                                     message=StatusCode.SYSTEM_ERROR.get_message())
 
-    async def logout(self, current_user: DecodeTokenData):
+    async def logout(self, current_user: DecodeTokenData) -> bool:
         """
         退出登录
         :param current_user: 当前用户
@@ -128,5 +128,33 @@ class AuthService:
             return True
         except Exception as e:
             logger.error(f"退出登录异常: {e}")
+            raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
+                                    message=StatusCode.SYSTEM_ERROR.get_message())
+
+    async def refresh_token(self, token: RefreshToken) -> Dict[str, Any]:
+        """
+        刷新token
+        :param token: 当前用户
+        :return: 返回新的Token
+        """
+        refresh_token = jwt_manager.decode_token(token.refresh_token)
+        if refresh_token.type != 'refresh':
+            raise BusinessException(code=StatusCode.TOKEN_INVALID.get_code(),
+                                    message=StatusCode.TOKEN_INVALID.get_message())
+        user = await self._repo.get_user_by_id(refresh_token.user_id, True)
+        if not user or token.refresh_token != user.get('refresh_token'):
+            raise BusinessException(code=StatusCode.TOKEN_INVALID.get_code(),
+                                    message=StatusCode.TOKEN_INVALID.get_message())
+        try:
+            payload = {'user_id': refresh_token.user_id, 'nickname': refresh_token.nickname}
+            new_token = jwt_manager.create_token(payload)
+            await self._repo.update_user_by_id(refresh_token.user_id, {
+                'last_modify_by': refresh_token.user_id, 'last_modify_time': date_util.get_now_timestamp(),
+                'last_modify_date': date_util.now(), 'access_token': new_token.access_token,
+                'refresh_token': new_token.refresh_token
+            })
+            return new_token.model_dump()
+        except Exception as e:
+            logger.error(f"刷新token异常: {e}")
             raise BusinessException(code=StatusCode.SYSTEM_ERROR.get_code(),
                                     message=StatusCode.SYSTEM_ERROR.get_message())

@@ -152,3 +152,26 @@ class LoginUser(BaseModel):
                 "password": "111111",
             }
         }
+
+
+class RefreshToken(BaseModel):
+    """ 刷新token """
+    refresh_token: str
+
+    @field_validator('refresh_token')
+    def check_refresh_token(cls, v: str):
+        """
+        验证刷新token
+        :param v: token
+        :return: 通过验证的合法token
+        """
+        if not v:
+            raise ValidationException(code=status.HTTP_400_BAD_REQUEST, message='刷新token不能为空')
+        return v
+
+    class Config:
+        json_schema_extra = {
+            'example': {
+                "refresh_token": "refresh_token"
+            }
+        }
