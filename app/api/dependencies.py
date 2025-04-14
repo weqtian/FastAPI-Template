@@ -43,6 +43,10 @@ async def get_current_user(
                 code=StatusCode.TOKEN_TYPE_ERROR.get_code(),
                 message=StatusCode.TOKEN_TYPE_ERROR.get_message()
             )
+        user = await UserRepository.get_user_by_id(decoded_data.user_id, True)
+        if not user or credentials.credentials !=  user.get('access_token'):
+            raise AuthException(code=StatusCode.TOKEN_INVALID.get_code(),
+                                message=StatusCode.TOKEN_INVALID.get_message())
         return decoded_data
     except AuthException as e:
         raise HTTPException(
