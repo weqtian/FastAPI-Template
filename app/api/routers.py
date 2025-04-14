@@ -9,6 +9,7 @@
 from fastapi import FastAPI
 from app.core.config import config
 from app.api.endpoints.auth import auth_router
+from app.api.endpoints.user import user_router
 
 
 def register_routers(app: FastAPI) -> None:
@@ -18,3 +19,4 @@ def register_routers(app: FastAPI) -> None:
     :return: None
     """
     app.include_router(auth_router, prefix=config.PROJECT_API_PREFIX)
+    app.include_router(user_router, prefix=config.PROJECT_API_PREFIX)

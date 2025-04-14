@@ -13,6 +13,7 @@ from app.exceptions.custom import AuthException
 from app.utils.request_util import request_util
 from app.schemas.security import DecodeTokenData
 from app.services.auth_service import AuthService
+from app.services.user_service import UserService
 from app.repositories.user_repo import UserRepository
 from fastapi import Request, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -71,6 +72,14 @@ async def get_auth_service(repo: UserRepository = Depends(get_user_repo)) -> Aut
     :return: UserService
     """
     return AuthService(repo)
+
+async def get_user_service(repo: UserRepository = Depends(get_user_repo)) -> UserService:
+    """
+    获取用户服务实例
+    :param repo: 用户数据库操作实例
+    :return: UserService
+    """
+    return UserService(repo)
 
 
 async def get_request_info(request: Request) -> Dict[str, Any]:
